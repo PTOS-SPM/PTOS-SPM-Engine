@@ -1,0 +1,7 @@
+#Visual Studio Files
+.vs/
+*.user
+
+#Build Output
+bin/
+bin-int/
