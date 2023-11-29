@@ -1,5 +1,16 @@
 #include <PTOS.h>
 
+class TestApplication : public PTOS::Application {
+public:
+	TestApplication() {
+
+	}
+
+	~TestApplication() {
+
+	}
+};
+
 PTOS::Application* PTOS::createApplication(void) {
-	return new Application();
+	return new TestApplication();
 }
