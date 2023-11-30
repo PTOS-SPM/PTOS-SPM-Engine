@@ -8,9 +8,10 @@
 extern PTOS::Application* PTOS::createApplication(void);
 
 int main(int argc, char** argv) {
+	PTOS::Log::init();
+	PTOS_CORE_TRACE("Creating Application");
 	PTOS::Application* app = PTOS::createApplication();
-	
-	std::cout << "Start Application\n";
+	PTOS_CORE_TRACE("Created Application");
 
 	//TODO run application
 	while (true); //DEBUG

@@ -1,0 +1,3 @@
+[submodule "PTOS-SPM-Engine/libs/spdlog"]
+	path = PTOS-SPM-Engine/libs/spdlog
+	url = https://github.com/gabime/spdlog.git
