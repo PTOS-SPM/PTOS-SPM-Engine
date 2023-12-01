@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.7.34031.279
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEngine", "TestEngine\TestEngine.vcxproj", "{8615D14D-53AF-4827-9BF2-3607AC72434B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTOS-SPM-Engine", "PTOS-SPM-Engine\PTOS-SPM-Engine.vcxproj", "{EB4F20D6-57DB-8D9A-60EC-108FCCF6E99A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTOS-SPM-Engine", "PTOS-SPM-Engine\PTOS-SPM-Engine.vcxproj", "{B64F659D-9878-43FF-8C3F-2601D48219F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEngine", "TestEngine\TestEngine.vcxproj", "{1BFF282A-07B7-6A77-70BE-43D35C950568}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,19 +11,16 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B64F659D-9878-43FF-8C3F-2601D48219F4}.Debug|x64.ActiveCfg = Debug|x64
-		{B64F659D-9878-43FF-8C3F-2601D48219F4}.Debug|x64.Build.0 = Debug|x64
-		{B64F659D-9878-43FF-8C3F-2601D48219F4}.Release|x64.ActiveCfg = Release|x64
-		{B64F659D-9878-43FF-8C3F-2601D48219F4}.Release|x64.Build.0 = Release|x64
-		{8615D14D-53AF-4827-9BF2-3607AC72434B}.Debug|x64.ActiveCfg = Debug|x64
-		{8615D14D-53AF-4827-9BF2-3607AC72434B}.Debug|x64.Build.0 = Debug|x64
-		{8615D14D-53AF-4827-9BF2-3607AC72434B}.Release|x64.ActiveCfg = Release|x64
-		{8615D14D-53AF-4827-9BF2-3607AC72434B}.Release|x64.Build.0 = Release|x64
+		{EB4F20D6-57DB-8D9A-60EC-108FCCF6E99A}.Debug|x64.ActiveCfg = Debug|x64
+		{EB4F20D6-57DB-8D9A-60EC-108FCCF6E99A}.Debug|x64.Build.0 = Debug|x64
+		{EB4F20D6-57DB-8D9A-60EC-108FCCF6E99A}.Release|x64.ActiveCfg = Release|x64
+		{EB4F20D6-57DB-8D9A-60EC-108FCCF6E99A}.Release|x64.Build.0 = Release|x64
+		{1BFF282A-07B7-6A77-70BE-43D35C950568}.Debug|x64.ActiveCfg = Debug|x64
+		{1BFF282A-07B7-6A77-70BE-43D35C950568}.Debug|x64.Build.0 = Debug|x64
+		{1BFF282A-07B7-6A77-70BE-43D35C950568}.Release|x64.ActiveCfg = Release|x64
+		{1BFF282A-07B7-6A77-70BE-43D35C950568}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6D3E901D-C5AA-4D70-8982-48146AB66000}
 	EndGlobalSection
 EndGlobal
