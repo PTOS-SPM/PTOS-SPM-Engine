@@ -21,9 +21,6 @@ project "PTOS-SPM-Engine"
         "%{prj.name}/src/**.cpp"
     }
 
-    pchheader "ptospch.h"
-    pchsource "%{prj.name}/src/ptospch.cpp"
-
     includedirs
     {
         "%{prj.name}/src",
