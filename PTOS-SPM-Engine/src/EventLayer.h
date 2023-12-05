@@ -3,70 +3,49 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <functional>
+
+#include "Event.h"
 
 namespace PTOS {
-	enum class EventType {
-		mouse_click,
-		key_press
-	};
 
-	struct Event {
-		EventType type;
-	};
-	class EventLayer {
-	private:
-		std::vector<Event*> eventQueue;
-		std::unordered_map<EventType, std::vector<std::function<void(Event*)>>> eventListeners;
+	//forward declaration, defined in EventSystem.h
+	struct EventContext;
 
+	typedef void (*EventListenerFunc)(EventContext&);
+
+
+	class PTOS_API EventLayer {
 	public:
-		void dispatchEvent(Event* event) {
-			eventQueue.push_back(event);
-		}
+		EventLayer(const EventType* types, size_t typeCount);
+		EventLayer() : EventLayer(nullptr, 0) {}
+		~EventLayer();
 
-		void addEventListener(EventType type, std::function<void(Event*)> listener) {
-			eventListeners[type].push_back(listener);
-		}
+		void dispatch(Event* event);
+		void addListener(EventType type, EventListenerFunc listener);
+		bool hasListener(EventType type, EventListenerFunc listener);
+		bool hasListener(EventListenerFunc listener);
+		bool removeListener(EventType type, EventListenerFunc listener);
+		bool removeListener(EventListenerFunc listener);
 
-		void handleEvents() {
-			for (Event* event : eventQueue) {
-				auto eventType = event->type;
-				if (eventListeners.find(eventType) != eventListeners.end()) {
-					for (auto& listener : eventListeners[eventType]) {
-						listener(event); //invoke the listener function
-					}
-				}
-			}
-			eventQueue.clear(); //clears processed events
-		}
+		inline const EventType* getTypes() const { return types; }
+		inline size_t getTypeCount() const { return typeCount; }
+		inline void clearQueue() { queue.clear(); }
+		inline std::vector<Event*>::const_iterator queueBegin() const { return queue.begin(); }
+		inline std::vector<Event*>::const_iterator queueEnd() const { return queue.end(); }
 
-		const std::vector<Event*>& getEventQueue() const {
-			return eventQueue;
-		}
+		//example of unholy c++ type, even using 2 typedefs
+
+		inline std::unordered_map<EventType, std::vector<EventListenerFunc>>::const_iterator listenersBegin() const { return listeners.begin(); }
+		inline std::unordered_map<EventType, std::vector<EventListenerFunc>>::const_iterator listenersEnd() const { return listeners.end(); }
+		inline std::vector<EventListenerFunc>::iterator getListenerBegin(EventType type) { return listeners[type].begin(); }
+		inline std::vector<EventListenerFunc>::iterator getListenerEnd(EventType type) { return listeners[type].end(); }
+		inline EventListenerFunc getListener(EventType type, size_t index) { return listeners[type].at(index); }
+
+	private:
+		const EventType* types;
+		size_t typeCount;
+		std::vector<Event*> queue;
+		std::unordered_map<EventType, std::vector<EventListenerFunc>> listeners;
 	};
 
-	int main() {
-		EventLayer eventLayer;
-
-		auto mouseClickListener = [](Event* event) {
-			std::cout << "mouse click event handled\n";
-		};
-
-		auto keyPressListener = [](Event* event) {
-			std::cout << "key press event handled\n";
-		};
-
-		eventLayer.addEventListener(EventType::mouse_click, mouseClickListener);
-		eventLayer.addEventListener(EventType::key_press, keyPressListener);
-
-		Event mouseClickEvent{ EventType::mouse_click };
-		Event keyPressEvent{ EventType::key_press };
-
-		eventLayer.dispatchEvent(&mouseClickEvent);
-		eventLayer.dispatchEvent(&keyPressEvent);
-
-		eventLayer.handleEvents();
-		
-		return 0;
-	}
 };

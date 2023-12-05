@@ -62,7 +62,7 @@
       <AdditionalIncludeDirectories>src;libs\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -86,7 +86,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -105,7 +105,6 @@
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\EventLayer.h" />
-    <ClInclude Include="src\EventStack.h" />
     <ClInclude Include="src\EventSystem.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\PTOS.h" />
@@ -116,7 +115,6 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Event.cpp" />
     <ClCompile Include="src\EventLayer.cpp" />
-    <ClCompile Include="src\EventStack.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
     <ClCompile Include="src\Log.cpp" />
   </ItemGroup>

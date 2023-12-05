@@ -1,44 +1,29 @@
 #pragma once
 
+#include "Core.h"
+
 namespace PTOS {
-	enum class EventType {
-		mousemove,
-		mousedown,
-		mouseup,
-		mousescroll
-		//add more later on, just defaults for now
-	};
 
-	class Event {
+	typedef unsigned short EventType;
+
+	class PTOS_API Event {
 	public:
-		Event(EventType type, bool propagate = true, bool send = true);
+		Event(EventType type, bool propagate, bool handle);
+		Event(EventType type) : Event(type, true, true) {}
 
-		inline bool shouldPropagate() const { return propagateToNextLayer; }
-		inline bool shouldSend() const { return handle; }
-		inline EventType getType() const { return eventType; }
+		inline bool shouldPropagate() const { return propagate; }
+		inline bool shouldHandle() const { return handle; }
+		inline EventType getType() const { return type; }
 	
+		void stopPropagate();
+		void stopHandle();
+
 	private:
-		Event() {}
-		bool propagateToNextLayer;
+		Event() : Event(0) {}
+		bool propagate;
 		bool handle;
-		EventType eventType;
+		EventType type;
 
-	};
-
-	class MouseInputEvent : public Event {
-	public:
-		MouseInputEvent(int x, int y, int buttonCode = -1, float scrollDirection = 0);
-		
-		inline int getMouseX() const { return x; }
-		inline int getMouseY() const { return y; }
-		inline int ButtonCode() const { return button; }
-		inline int getScrollDirection() const { return scrollDirection; }
-
-	private:
-		int x;
-		int y;
-		int button; // mouse button pressed
-		float scrollDirection; //scroll wheel direction info
 	};
 }
 

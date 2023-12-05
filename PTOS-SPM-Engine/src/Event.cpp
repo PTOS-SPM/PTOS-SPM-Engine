@@ -1,37 +1,25 @@
 #include "Event.h"
+#include "Log.h"
+
+#include <iostream>
 
 namespace PTOS {
-	Event::Event(EventType type, bool propagate, bool send)
-		: eventType(type), propagateToNextLayer(propagate), handle(send) {}
-
-	bool Event::shouldPropagate() const {
-		return propagateToNextLayer;
+	Event::Event(EventType type, bool propagate, bool handle) {
+		this->type = type;
+		this->propagate = propagate;
+		this->handle = handle;
 	}
 
-	bool Event::shouldSend() const {
-		return handle;
+	void Event::stopPropagate() {
+		propagate = false;
 	}
 
-	EventType Event::getType() const {
-		return eventType;
+	void Event::stopHandle() {
+		handle = false;
 	}
+}
 
-	MouseInputEvent::MouseInputEvent(int x, int y, int buttonCode, float scrollDirection)
-		: Event(EventType::mousemove), x(x), y(y), button(buttonCode), scrollDirection(scrollDirection) {}
-	
-	int MouseInputEvent::getMouseX() const {
-		return x;
-	}
-
-	int MouseInputEvent::getMouseY() const {
-		return y;
-	}
-
-	int MouseInputEvent::ButtonCode() const {
-		return button;
-	}
-
-	int MouseInputEvent::getScrollDirection() const {
-		return scrollDirection;
-	}
+std::ostream& operator<< (std::ostream& os, PTOS::Event& event) {
+	return os << "<Event (" << event.getType() << ") handle=" << event.shouldHandle() <<
+		", propagate=" << event.shouldPropagate() << " at " << &event << ">";
 }
