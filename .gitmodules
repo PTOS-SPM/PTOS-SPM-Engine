@@ -1,3 +1,6 @@
 [submodule "PTOS-SPM-Engine/libs/spdlog"]
 	path = PTOS-SPM-Engine/libs/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "PTOS-SPM-Engine/libs/glfw"]
+	path = PTOS-SPM-Engine/libs/glfw
+	url = https://github.com/PTOS-SPM/glfw.git
