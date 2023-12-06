@@ -6,7 +6,12 @@ workspace "PTOS-SPM"
         "Release"
     }
 
-    outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+cwd = path.getabsolute(".")
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+IncludeDir = {}
+IncludeDir["GLFW"] = "PTOS-SPM-Engine/libs/glfw/include"
+
+include "PTOS-SPM-Engine/libs/glfw"
 
 project "PTOS-SPM-Engine"
     location "PTOS-SPM-Engine"
@@ -27,7 +32,13 @@ project "PTOS-SPM-Engine"
     includedirs
     {
         "%{prj.name}/src",
-        "%{prj.name}/libs/spdlog/include"
+        "%{prj.name}/libs/spdlog/include",
+        "%{IncludeDir.GLFW}"
+    }
+
+    links {
+        "GLFW",
+        "opengl32.lib"
     }
 
     filter "system:windows"
@@ -47,11 +58,11 @@ project "PTOS-SPM-Engine"
         }
 
     filter "configurations:Debug"
-        defines "PTOS_DEBUG"
+        defines {"PTOS_BUILD_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
         symbols "ON"
 
     filter "configurations:Release"
-        defines "PTOS_RELEASE"
+        defines "PTOS_BUILD_RELEASE"
         optimize "ON"
 
 project "TestEngine"
@@ -70,6 +81,7 @@ project "TestEngine"
     includedirs
     {
         "PTOS-SPM-Engine/libs/spdlog/include",
+        "%{IncludeDir.GLFW}",
         "PTOS-SPM-Engine/src"
     }
 
@@ -88,7 +100,7 @@ project "TestEngine"
         }
 
     filter "configurations:Debug"
-        defines "PTOS_DEBUG"
+        defines {"PTOS_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
         symbols "ON"
 
     filter "configurations:Release"
