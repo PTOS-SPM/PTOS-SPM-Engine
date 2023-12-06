@@ -1,11 +1,13 @@
 #include "Log.h"
 
 namespace PTOS {
-	std::shared_ptr<spdlog::logger> Log::coreLogger;
-	std::shared_ptr<spdlog::logger> Log::appLogger;
+	static const char LOGGING_PATTERN[] = "[%T.%f] %n: %^%v%$";
+
+	PTOS_API std::shared_ptr<spdlog::logger> Log::coreLogger;
+	PTOS_API std::shared_ptr<spdlog::logger> Log::appLogger;
 
 	void Log::init(spdlog::level::level_enum coreLevel, spdlog::level::level_enum appLevel, const std::string &appLoggerName) {
-		spdlog::set_pattern("[%T] %n: %^%v%$");
+		spdlog::set_pattern(LOGGING_PATTERN);
 		coreLogger = spdlog::stdout_color_mt("ENGINE");
 		coreLogger->set_level(coreLevel);
 		appLogger = spdlog::stdout_color_mt(appLoggerName);
