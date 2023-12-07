@@ -1,8 +1,7 @@
 #pragma once
 
-#include "ptospch.h"
-
 #include "Application.h"
+#include "EventSystem.h"
 #include "Log.h"
 #include "Window.h"
 
