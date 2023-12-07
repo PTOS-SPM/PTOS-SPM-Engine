@@ -21,9 +21,6 @@ project "PTOS-SPM-Engine"
         "%{prj.name}/src/**.cpp"
     }
 
-    pchheader "ptospch.h"
-    pchsource "%{prj.name}/src/ptospch.cpp"
-
     includedirs
     {
         "%{prj.name}/src",
@@ -47,10 +44,14 @@ project "PTOS-SPM-Engine"
         }
 
     filter "configurations:Debug"
+        staticruntime "off"
+        runtime "Debug"
         defines "PTOS_DEBUG"
         symbols "ON"
 
     filter "configurations:Release"
+        staticruntime "off"
+        runtime "Release"
         defines "PTOS_RELEASE"
         optimize "ON"
 
@@ -88,9 +89,13 @@ project "TestEngine"
         }
 
     filter "configurations:Debug"
+        staticruntime "off"
+        runtime "Debug"
         defines "PTOS_DEBUG"
         symbols "ON"
-
-    filter "configurations:Release"
+        
+        filter "configurations:Release"
+        staticruntime "off"
+        runtime "Release"
         defines "PTOS_RELEASE"
         optimize "ON"
