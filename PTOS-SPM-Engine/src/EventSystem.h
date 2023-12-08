@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Application.h"
 #include "EventLayer.h"
 
 namespace PTOS {
@@ -14,7 +15,7 @@ namespace PTOS {
 	class PTOS_API EventSystem {
 
 	public:
-		EventSystem();
+		EventSystem(Application* app);
 		~EventSystem();
 
 		bool addLayer(EventLayer* layer);
@@ -38,15 +39,11 @@ namespace PTOS {
 		void removeType(EventType type);
 		void handleEvent(Event* event, EventLayer* layer, std::vector<Event*>& pg);
 
+		Application* app;
 		std::vector<EventLayer*> layers;
 		EventTypeLL* types = nullptr;
 	};
 
-	struct PTOS_API EventContext {
-		EventSystem* system = nullptr;
-		EventLayer* layer = nullptr;
-		EventListenerFunc listener = nullptr;
-		Event* event = nullptr;
-	};
+	struct PTOS_API EventContext;
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "WindowRenderer.h"
 
 #define PTOS_NEW_WINDOW(width, height, title, icon, renderer) \
@@ -29,6 +30,8 @@ namespace PTOS {
 		inline void setHeight(int height) { renderer->setHeight(height); }
 		inline void setSize(const WindowSize& size) { renderer->setSize(size); }
 		inline void setTitle(const std::string& title) { renderer->setTitle(title); }
+		inline bool isOpen() { return renderer->isCreated(); }
+		inline bool isShutdown() { return renderer->getShutdown(); }
 
 	private:
 		WindowRenderer* renderer;

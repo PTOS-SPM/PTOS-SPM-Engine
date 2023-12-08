@@ -1,11 +1,14 @@
 #include "EventSystem.h"
 #include "Log.h"
 
+#include "Contexts.h"
+
 #include <ostream>
 
 namespace PTOS {
 
-    EventSystem::EventSystem() {
+    EventSystem::EventSystem(Application* app) {
+        this->app = app;
         layers = std::vector<EventLayer*>();
     }
 
@@ -135,6 +138,8 @@ namespace PTOS {
 
             for (Event* event : copyQueue)
                 handleEvent(event, layer, propagateNext);
+            copyQueue.clear();
+
             for (Event* event : propagate)
                 handleEvent(event, layer, propagateNext);
 
@@ -152,7 +157,7 @@ namespace PTOS {
         EventType type = event->getType();
         auto end = layer->getListenerEnd(type);
         for (auto lst = layer->getListenerBegin(type); lst != end && event->shouldHandle(); lst++) {
-            (*lst)(EventContext{this, layer, *lst, event});
+            (*lst)(EventContext{this, layer, *lst, event, app});
         }
         if (event->shouldPropagate())
             pg.push_back(event);

@@ -7,10 +7,6 @@
 
 namespace PTOS {
 
-	struct PTOS_API ApplicationContext {
-		//TODO EventStack* eventStack
-	};
-
 	class PTOS_API ApplicationWindows {
 	public:
 
@@ -18,7 +14,7 @@ namespace PTOS {
 		~ApplicationWindows();
 
 		inline size_t size() const { return windows.size(); }
-		inline Window* get(int index) { return windows.at(index); }
+		inline Window* get(size_t index) { return windows.at(index); }
 		inline void clear() { return windows.clear(); }
 		inline std::vector<Window*>::const_iterator begin() const { return windows.begin(); }
 		inline std::vector<Window*>::const_iterator end() const { return windows.end(); }
@@ -28,6 +24,8 @@ namespace PTOS {
 		bool add(Window* window);
 		bool remove(size_t index);
 		bool remove(Window* window);
+
+		void handle();
 
 	private:
 		std::vector<Window*> windows;
@@ -42,10 +40,14 @@ namespace PTOS {
 
 		inline bool doRun() const { return run; }
 
-	private:
+	protected:
 		bool run = true;
 	};
 
-	Application* startApplication(PTOS::ApplicationContext& ctx);
+	struct PTOS_API ApplicationContext;
+
+
+	Application* createApplication();
+	void startApplication(ApplicationContext& ctx);
 	void endApplication(Application* application);
 }

@@ -1,17 +1,53 @@
 #include <PTOS.h>
 #include <sstream>
 
-class TestApplication : public PTOS::Application { };
+class TestApplication : public PTOS::Application {
+public:
+	inline PTOS::Window* getMainWindow() { return mainWindow; }
 
-PTOS::Application* PTOS::startApplication(PTOS::ApplicationContext& ctx) {
-	TestApplication* app = new TestApplication();
+	void stop() { run = false; }
 
-	Window* window = PTOS_NEW_WINDOW(800, 450, "Test Application", nullptr, new GLFWRenderer());
-	window->open();
+	void onStart(PTOS::ApplicationContext& ctx) {
+		if (started) return;
+		started = true;
+		
+		//setup main window
+		PTOS::EventLayer* winLayer = ctx.eventSystem->getLayer(1);
+		mainWindow = PTOS_NEW_WINDOW(800, 450, "Test Application", nullptr, new PTOS::GLFWRenderer(winLayer));
+		mainWindow->open();
 
-	app->windows.add(window);
+		//add event listeners
+		winLayer->addListener(PTOS::WINDOW_CLOSE, [](PTOS::EventContext& ctx) {
+			auto event = (PTOS::WindowEvent*)ctx.event;
+			event->getRenderer()->shutdown(); //perma-close window
 
-	return app;
+			//if window closed was the main window, then stop the app
+			TestApplication* app = (TestApplication*)ctx.app;
+			if (event->getRenderer() == app->getMainWindow()->getRenderer())
+				app->stop();
+			event->stopPropagate();
+			event->stopHandle();
+		});
+		winLayer->addListener(PTOS::WINDOW_MOUSE_MOVE, [](PTOS::EventContext& ctx) {
+			auto event = (PTOS::WindowEvent*)ctx.event;
+			PTOS_DEBUG("Mouse: ({0}, {1})", event->getScrollX(), event->getScrollY());
+		});
+
+		windows.add(mainWindow);
+	}
+
+private:
+	PTOS::Window* mainWindow;
+	bool started = false;
+};
+
+PTOS::Application* PTOS::createApplication() {
+	return new TestApplication();
+}
+
+void PTOS::startApplication(PTOS::ApplicationContext& ctx) {
+	TestApplication* app = (TestApplication*)ctx.app;
+	app->onStart(ctx);
 }
 
 void PTOS::endApplication(Application* application) {

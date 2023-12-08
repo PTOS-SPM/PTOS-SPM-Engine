@@ -45,6 +45,19 @@ namespace PTOS {
 		return false;
 	}
 
+	void ApplicationWindows::handle() {
+		size_t i = 0;
+		while (i < windows.size()) {
+			Window* window = get(i);
+			if (window->isShutdown())
+				remove(i);
+			else if (window->isOpen()) {
+				window->update();
+				i++;
+			}
+		}
+	}
+
 	//Application
 
 	Application::Application() {
