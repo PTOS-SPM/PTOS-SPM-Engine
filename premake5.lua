@@ -10,8 +10,10 @@ cwd = path.getabsolute(".")
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "PTOS-SPM-Engine/libs/glfw/include"
+IncludeDir["GLAD"] = "PTOS-SPM-Engine/libs/glad/include"
 
 include "PTOS-SPM-Engine/libs/glfw"
+include "PTOS-SPM-Engine/libs/glad"
 
 project "PTOS-SPM-Engine"
     location "PTOS-SPM-Engine"
@@ -30,11 +32,13 @@ project "PTOS-SPM-Engine"
     {
         "%{prj.name}/src",
         "%{prj.name}/libs/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.GLAD}"
     }
 
     links {
         "GLFW",
+        "GLAD",
         "opengl32.lib"
     }
 
@@ -83,6 +87,7 @@ project "TestEngine"
     {
         "PTOS-SPM-Engine/libs/spdlog/include",
         "%{IncludeDir.GLFW}",
+        "%{IncludeDir.GLAD}",
         "PTOS-SPM-Engine/src"
     }
 

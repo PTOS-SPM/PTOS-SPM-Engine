@@ -4,3 +4,6 @@
 [submodule "PTOS-SPM-Engine/libs/glfw"]
 	path = PTOS-SPM-Engine/libs/glfw
 	url = https://github.com/PTOS-SPM/glfw.git
+[submodule "PTOS-SPM-Engine/libs/glad"]
+	path = PTOS-SPM-Engine/libs/glad
+	url = https://github.com/PTOS-SPM/glad.git
