@@ -1,55 +1,82 @@
 #include <PTOS.h>
 #include <sstream>
 
+void onWindowClose(PTOS::EventContext& ctx);
+void onWindowUpdate(PTOS::EventContext& ctx);
+
 class TestApplication : public PTOS::Application {
 public:
 	inline PTOS::Window* getMainWindow() { return mainWindow; }
 
 	void stop() { run = false; }
 
-	void onStart(PTOS::ApplicationContext& ctx) {
-		if (started) return;
-		started = true;
+	void onStart(PTOS::ApplicationContextManager& ctx) {
+		if (mainWindow) return;
 		
-		//setup main window
-		PTOS::EventLayer* winLayer = ctx.eventSystem->getLayer(1);
-		mainWindow = PTOS_NEW_WINDOW(800, 450, "Test Application", nullptr, new PTOS::GLFWRenderer(winLayer));
+		//setup windows
+
+		mainWindow = ctx.newWindow(800, 450, std::string("Test Application"), nullptr, [](PTOS::EventLayer* layer) { return (PTOS::WindowRenderer*)(new PTOS::GLFWRenderer(layer)); });
 		mainWindow->open();
+		
+		/* Got annoying
+		auto subwindow = ctx.newWindow(800, 450, std::string("Sub Window"), nullptr, [](PTOS::EventLayer* layer) { return (PTOS::WindowRenderer*)(new PTOS::GLFWRenderer(layer)); });
+		subwindow->open();
+		*/
+
+		//create Game Layer
+
+		PTOS::EventLayer* gameLayer = ctx.newLayer();
 
 		//add event listeners
-		winLayer->addListener(PTOS::WINDOW_CLOSE, [](PTOS::EventContext& ctx) {
-			auto event = (PTOS::WindowEvent*)ctx.event;
-			event->getRenderer()->shutdown(); //perma-close window
 
-			//if window closed was the main window, then stop the app
-			TestApplication* app = (TestApplication*)ctx.app;
-			if (event->getRenderer() == app->getMainWindow()->getRenderer())
-				app->stop();
-			event->stopPropagate();
-			event->stopHandle();
-		});
-		winLayer->addListener(PTOS::WINDOW_MOUSE_MOVE, [](PTOS::EventContext& ctx) {
-			auto event = (PTOS::WindowEvent*)ctx.event;
-			PTOS_DEBUG("Mouse: ({0}, {1})", event->getScrollX(), event->getScrollY());
-		});
-
-		windows.add(mainWindow);
+		gameLayer->addListener(PTOS::WINDOW_CLOSE, onWindowClose);
+		gameLayer->addListener(PTOS::WINDOW_UPDATE, onWindowUpdate);
 	}
 
 private:
-	PTOS::Window* mainWindow;
-	bool started = false;
+	PTOS::Window* mainWindow = nullptr;
 };
 
-PTOS::Application* PTOS::createApplication() {
+void onWindowClose(PTOS::EventContext& ctx) {
+	PTOS::WindowEvent* event = (PTOS::WindowEvent*)ctx.event;
+	event->getRenderer()->shutdown(); //perma-close window
+
+	//if window closed was the main window, then stop the app
+	TestApplication* app = (TestApplication*)ctx.app;
+	if (event->getRenderer() == app->getMainWindow()->getRenderer())
+		app->stop();
+	event->stopPropagate();
+	event->stopHandle();
+}
+
+void onWindowUpdate(PTOS::EventContext& ctx) {
+	PTOS::WindowEvent* event = (PTOS::WindowEvent*)ctx.event;
+	PTOS::Input input(event->getRenderer());
+
+	TestApplication* app = (TestApplication*)ctx.app;
+	if (event->getRenderer() != app->getMainWindow()->getRenderer())
+		return;
+
+	const char letters[26] = { 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' };
+
+	for (auto& pair : input.getHoldAll()) {
+		int index = pair.first - 'A';
+		PTOS_DEBUG("{0}: {1}", index < 0 || index > 25 ? '?' : letters[index], pair.second.count);
+	}
+}
+
+PTOS_HOOK_CREATE_APPLICATION {
 	return new TestApplication();
 }
 
-void PTOS::startApplication(PTOS::ApplicationContext& ctx) {
-	TestApplication* app = (TestApplication*)ctx.app;
+PTOS_HOOK_START_APPLICATION {
+	TestApplication* app = (TestApplication*)ctx.getApplication();
 	app->onStart(ctx);
 }
 
-void PTOS::endApplication(Application* application) {
+PTOS_HOOK_END_APPLICATION {
 	delete application;
 }
+
+PTOS_HOOK_PRE_UPDATE_DEFAULT
+PTOS_HOOK_POST_UPDATE_DEFAULT

@@ -9,7 +9,6 @@ namespace PTOS {
 	class PTOS_API Window;
 	enum PTOS_API WindowEventType;
 	class PTOS_API WindowEvent;
-	class PTOS_API InputPoller;
 	class PTOS_API GLFWRenderer;
 	class PTOS_API GLFWInput;
 }

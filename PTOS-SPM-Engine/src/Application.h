@@ -2,12 +2,14 @@
 
 #include <vector>
 
-#include "Core.h"
+#include "symbols/application.h"
+#include "EventSystem.h"
+#include "Hooks.h"
 #include "Window.h"
 
 namespace PTOS {
 
-	class PTOS_API ApplicationWindows {
+	class ApplicationWindows {
 	public:
 
 		ApplicationWindows();
@@ -31,7 +33,7 @@ namespace PTOS {
 		std::vector<Window*> windows;
 	};
 
-	class PTOS_API Application
+	class Application
 	{
 	public:
 		Application();
@@ -44,10 +46,33 @@ namespace PTOS {
 		bool run = true;
 	};
 
-	struct PTOS_API ApplicationContext;
+	//define context related data
+
+	struct ApplicationContext {
+		Application* app = nullptr;
+		EventSystem* eventSystem = nullptr;
+	};
+
+	class ApplicationContextManager {
+	public:
+		ApplicationContextManager(ApplicationContext& ctx) { this->ctx = ctx; }
+
+		inline Application* getApplication() { return ctx.app; }
+
+		Window* newWindow(int width, int heigt, std::string& title, void* icon, WindowRenderer* (*rendererCallback)(EventLayer*));
+		EventLayer* newLayer(EventType* types, size_t typeCount);
+		EventLayer* newLayer() { return newLayer(nullptr, 0); };
+
+	private:
+		ApplicationContext ctx;
+	};
 
 
-	Application* createApplication();
-	void startApplication(ApplicationContext& ctx);
-	void endApplication(Application* application);
+	//define hook-in events
+
+	_PTOS_HOOKDEF_CREATE_APPLICATION();
+	_PTOS_HOOKDEF_START_APPLICATION();
+	_PTOS_HOOKDEF_END_APPLICATION();
+	_PTOS_HOOKDEF_PRE_UPDATE();
+	_PTOS_HOOKDEF_POST_UPDATE();
 }

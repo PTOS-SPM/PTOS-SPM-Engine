@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "EventLayer.h"
 #include "Log.h"
 

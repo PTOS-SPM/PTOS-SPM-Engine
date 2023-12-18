@@ -1,9 +1,9 @@
 #pragma once
 
-#include<GLFW/glfw3.h>
+#include <GLFW/glfw3.h>
 
-#include "Core.h"
-#include "EventLayer.h"
+#include "symbols/eventsystem.h"
+#include "symbols/window.h"
 
 #define PTOS_OVERRIDE_WINDOW_RENDERER_METHODS(name) \
 		name(EventLayer* eventLayer) : WindowRenderer(eventLayer) {} \
@@ -18,7 +18,8 @@
 		void setHeight(int height) override; \
 		void setSize(const WindowSize& size) override; \
 		void setTitle(const std::string& title) override; \
-		inline std::string getRendererName() override { return #name; }
+		inline std::string getRendererName() override { return #name; } \
+		inline void* getImplWindow() override;
 
 //sets width=0, height=0, bytes=0
 #define PTOS_GLFW_ICON_EMPTY {0,0,0}
@@ -28,7 +29,7 @@ namespace PTOS {
 	const bool VSYNC_DEFAULT = true;
 
 
-	struct PTOS_API WindowSize {
+	struct WindowSize {
 		WindowSize() { width = 0; height = 0; }
 		WindowSize(int width, int height) {
 			this->width = width;
@@ -39,7 +40,7 @@ namespace PTOS {
 		int height;
 	};
 
-	struct PTOS_API WindowProperties {
+	struct WindowProperties {
 		WindowProperties() {
 			this->size = WindowSize();
 			title = "";
@@ -58,7 +59,7 @@ namespace PTOS {
 	};
 
 	//abstract class for Window Renderers
-	class PTOS_API WindowRenderer
+	class WindowRenderer
 	{
 	public:
 		WindowRenderer(EventLayer* eventLayer);
@@ -81,6 +82,7 @@ namespace PTOS {
 		virtual void setTitle(const std::string& title) = 0;
 		virtual bool isCreated() = 0;
 		virtual std::string getRendererName() = 0;
+		virtual inline void* getImplWindow() = 0;
 
 		inline EventLayer* getEventLayer() const { return eventLayer; }
 
@@ -97,6 +99,7 @@ namespace PTOS {
 		bool isShutdown = false;
 
 		EventLayer* eventLayer;
+		
 
 		WindowSize size;
 		std::string title = "";

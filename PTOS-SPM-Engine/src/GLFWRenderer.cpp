@@ -1,5 +1,7 @@
 #include <glad/glad.h>
 
+#include "Event.h"
+#include "EventLayer.h"
 #include "GLFWRenderer.h"
 #include "Log.h"
 #include "WindowEvent.h"
@@ -135,6 +137,7 @@ namespace PTOS {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
 			renderer->getEventLayer()->dispatch(new WindowEvent(WINDOW_MOVE, renderer, xpos, ypos));
 		});
+		//TODO map keycodes here to PTOS/SPM keycodes https://www.glfw.org/docs/3.3/group__keys.html
 		glfwSetKeyCallback(win, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
 
@@ -167,7 +170,6 @@ namespace PTOS {
 		});
 		glfwSetCursorPosCallback(win, [](GLFWwindow* window, double xpos, double ypos) {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
-			PTOS_CORE_DEBUG("{0},{1}", xpos, ypos);
 			renderer->getEventLayer()->dispatch(new WindowEvent(WINDOW_MOUSE_MOVE, renderer, xpos, ypos));
 		});
 		PTOS_CORE_INFO("GLFW WindowRenderer \"{0}\" created", title);
@@ -178,4 +180,9 @@ namespace PTOS {
 		win = nullptr;
 		PTOS_CORE_INFO("GLFW WindowRenderer \"{0}\" destroyed", title);
 	}
+
+	void* GLFWRenderer::getImplWindow() {
+		return win;
+	}
+
 }

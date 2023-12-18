@@ -1,3 +1,4 @@
+#include "Event.h"
 #include "WindowEvent.h"
 
 namespace PTOS {

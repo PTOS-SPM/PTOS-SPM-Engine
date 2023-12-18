@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Core.h"
+#include "symbols/eventsystem.h"
 
 namespace PTOS {
 
-	typedef unsigned short EventType;
-
-	class PTOS_API Event {
+	class Event {
 	public:
 		Event(EventType type, bool propagate, bool handle);
 		Event(EventType type) : Event(type, true, true) {}

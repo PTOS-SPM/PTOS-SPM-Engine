@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Window.h"
+#include "WindowRenderer.h"
 
 
 namespace PTOS {
@@ -21,7 +22,15 @@ namespace PTOS {
 		renderer->destroy();
 	}
 
-	void Window::update() { renderer->update(); }
+	bool Window::update() {
+		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - lastFrame);
+		if (duration.count() >= framerate) {
+			renderer->update();
+			lastFrame = std::chrono::high_resolution_clock::now();
+			return true;
+		}
+		return false;
+	}
 }
 
 std::ostream& operator<< (std::ostream& out, PTOS::Window& window) {

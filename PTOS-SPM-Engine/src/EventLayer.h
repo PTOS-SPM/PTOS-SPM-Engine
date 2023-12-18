@@ -4,17 +4,12 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Event.h"
+#include "symbols/application.h"
+#include "symbols/eventsystem.h"
 
 namespace PTOS {
 
-	//forward declaration, defined in EventSystem.h
-	struct EventContext;
-
-	typedef void (*EventListenerFunc)(EventContext&);
-
-
-	class PTOS_API EventLayer {
+	class EventLayer {
 	public:
 		EventLayer(const EventType* types, size_t typeCount);
 		EventLayer() : EventLayer(nullptr, 0) {}
@@ -46,6 +41,13 @@ namespace PTOS {
 		size_t typeCount;
 		std::vector<Event*> queue;
 		std::unordered_map<EventType, std::vector<EventListenerFunc>> listeners;
+	};
+
+	struct EventContext {
+		EventLayer* layer = nullptr;
+		EventListenerFunc listener = nullptr;
+		Event* event = nullptr;
+		Application* app = nullptr;
 	};
 
 };

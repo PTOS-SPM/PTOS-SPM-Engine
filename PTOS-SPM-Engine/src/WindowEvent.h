@@ -1,14 +1,17 @@
 #pragma once
 
-#include "Core.h"
-#include "EventSystem.h"
-#include "WindowRenderer.h"
+#include "symbols/eventsystem.h"
+#include "symbols/window.h"
+
+#include "Event.h"
 
 namespace PTOS {
 
+	const EventType WINDOW_EVENT_BEGIN = 100;
+
 	//Code 100 -> 199
-	enum PTOS_API WindowEventType : EventType {
-		WINDOW_OPEN = 100,
+	enum WindowEventType : EventType {
+		WINDOW_OPEN = WINDOW_EVENT_BEGIN,
 		WINDOW_CLOSE,
 		WINDOW_MOVE,
 		WINDOW_RESIZE,
@@ -24,7 +27,7 @@ namespace PTOS {
 	const WindowEventType WINDOW_EVENT_TYPES[] = { WINDOW_OPEN, WINDOW_CLOSE, WINDOW_MOVE, WINDOW_RESIZE };
 	const size_t WINDOW_EVENT_COUNT = sizeof(WINDOW_EVENT_TYPES) / sizeof(WINDOW_EVENT_TYPES[0]);
 
-	class PTOS_API WindowEvent: public Event
+	class WindowEvent: public Event
 	{
 	public:
 		WindowEvent(WindowEventType type, WindowRenderer* renderer);
@@ -35,8 +38,8 @@ namespace PTOS {
 		inline WindowRenderer* getRenderer() { return renderer; }
 		inline int getWidth() const { return (int)x; }
 		inline int getHeight() const { return (int)y; }
-		inline int getDX() const { return (int)x; }
-		inline int getDY() const { return (int)y; }
+		inline int getMoveX() const { return (int)x; }
+		inline int getMoveY() const { return (int)y; }
 		inline double getMouseX() const { return x; }
 		inline double getMouseY() const { return y; }
 		inline double getScrollX() const { return x; }

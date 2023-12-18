@@ -1,4 +1,7 @@
 #include "Application.h"
+#include "EventLayer.h"
+#include "WindowRenderer.h"
+#include "WindowEvent.h"
 
 namespace PTOS {
 
@@ -70,5 +73,26 @@ namespace PTOS {
 		windows.clear();
 	}
 
+	//Application Context Manager
+
+	Window* ApplicationContextManager::newWindow(int width, int height, std::string& title, void* icon, WindowRenderer* (*rendererCallback)(EventLayer*)) {
+		EventLayer* windowLayer = nullptr;
+		for (auto lyr = ctx.eventSystem->layersBegin(); lyr != ctx.eventSystem->layersEnd() && windowLayer == nullptr; lyr++) {
+			EventLayer* layer = *lyr;
+			if (!layer->getTypeCount() || layer->getTypes()[0] != WINDOW_EVENT_BEGIN) continue;
+			windowLayer = layer;
+		}
+
+		WindowRenderer* renderer = rendererCallback(windowLayer);
+		Window* window = new Window(WindowProperties(WindowSize(width, height), std::string(title), icon), renderer);
+		ctx.app->windows.add(window);
+		return window;
+	}
+
+	EventLayer* ApplicationContextManager::newLayer(EventType* types, size_t typeCount) {
+		EventLayer* layer = new EventLayer(types, typeCount);
+		ctx.eventSystem->addLayer(layer);
+		return layer;
+	}
 
 }
