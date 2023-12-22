@@ -1,6 +1,7 @@
 #pragma once
 
 #include "symbols/eventsystem.h"
+#include "symbols/input.h"
 #include "symbols/window.h"
 
 #include "Event.h"
@@ -31,7 +32,7 @@ namespace PTOS {
 	{
 	public:
 		WindowEvent(WindowEventType type, WindowRenderer* renderer);
-		WindowEvent(WindowEventType type, WindowRenderer* renderer, int code);
+		WindowEvent(WindowEventType type, WindowRenderer* renderer, InputCode code);
 		WindowEvent(WindowEventType type, WindowRenderer* renderer, int x, int y);
 		WindowEvent(WindowEventType type, WindowRenderer* renderer, double x, double y);
 
@@ -44,14 +45,14 @@ namespace PTOS {
 		inline double getMouseY() const { return y; }
 		inline double getScrollX() const { return x; }
 		inline double getScrollY() const { return y; }
-		inline int getKeyCode() const { return code; }
-		inline int getMouseButton() const { return code; }
+		inline InputCode getKeyCode() const { return code; }
+		inline InputCode getMouseButton() const { return code; }
 
 	private:
-		WindowRenderer* renderer;
+		WindowRenderer* renderer = nullptr;
 		double x = 0;
 		double y = 0;
-		int code = -1;
+		InputCode code = (InputCode)(-1);
 	};
 }
 

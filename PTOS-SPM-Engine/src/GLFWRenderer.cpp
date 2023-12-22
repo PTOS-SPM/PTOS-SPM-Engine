@@ -2,6 +2,7 @@
 
 #include "Event.h"
 #include "EventLayer.h"
+#include "Input.h"
 #include "GLFWRenderer.h"
 #include "Log.h"
 #include "WindowEvent.h"
@@ -149,7 +150,7 @@ namespace PTOS {
 			else
 				return;
 
-			renderer->getEventLayer()->dispatch(new WindowEvent(type, renderer, key));
+			renderer->getEventLayer()->dispatch(new WindowEvent(type, renderer, codeMapGLFW.count(key) ? codeMapGLFW.at(key) : (InputCode)key));
 		});
 		glfwSetMouseButtonCallback(win, [](GLFWwindow* window, int button, int action, int mods) {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
@@ -162,7 +163,7 @@ namespace PTOS {
 			else
 				return;
 
-			renderer->getEventLayer()->dispatch(new WindowEvent(type, renderer, button));
+			renderer->getEventLayer()->dispatch(new WindowEvent(type, renderer, PTOS_INPUT_IS_MOUSE(button) ? (InputCode)button : INPUT_CODE_NONE));
 		});
 		glfwSetScrollCallback(win, [](GLFWwindow* window, double xoffset, double yoffset) {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);

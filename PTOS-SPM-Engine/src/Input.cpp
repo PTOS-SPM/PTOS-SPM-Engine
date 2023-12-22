@@ -52,6 +52,15 @@ namespace PTOS {
 		return rtv;
 	}
 
+	WindowInputStateMap Input::getAnyAll() {
+		WindowInputStateMap rtv;
+		if (!statemap.count(renderer)) return rtv;
+		for (auto& pair : statemap[renderer])
+			if (pair.second.count != 0)
+				rtv[pair.first] = pair.second;
+		return rtv;
+	}
+
 	void Input::onWindowUpdate(EventContext& ctx) {
 		WindowEvent* event = (WindowEvent*)ctx.event;
 		WindowRenderer* renderer = event->getRenderer();

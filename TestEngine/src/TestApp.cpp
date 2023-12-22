@@ -17,11 +17,9 @@ public:
 
 		mainWindow = ctx.newWindow(800, 450, std::string("Test Application"), nullptr, [](PTOS::EventLayer* layer) { return (PTOS::WindowRenderer*)(new PTOS::GLFWRenderer(layer)); });
 		mainWindow->open();
-		
-		/* Got annoying
+
 		auto subwindow = ctx.newWindow(800, 450, std::string("Sub Window"), nullptr, [](PTOS::EventLayer* layer) { return (PTOS::WindowRenderer*)(new PTOS::GLFWRenderer(layer)); });
 		subwindow->open();
-		*/
 
 		//create Game Layer
 
@@ -57,11 +55,8 @@ void onWindowUpdate(PTOS::EventContext& ctx) {
 	if (event->getRenderer() != app->getMainWindow()->getRenderer())
 		return;
 
-	const char letters[26] = { 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' };
-
-	for (auto& pair : input.getHoldAll()) {
-		int index = pair.first - 'A';
-		PTOS_DEBUG("{0}: {1}", index < 0 || index > 25 ? '?' : letters[index], pair.second.count);
+	for (auto& pair : input.getAnyAll()) {
+		PTOS_DEBUG("{0}: {1}", (int)pair.first, pair.second.count);
 	}
 }
 

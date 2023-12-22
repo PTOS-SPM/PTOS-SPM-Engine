@@ -7,12 +7,22 @@
 #include "symbols/input.h"
 #include "symbols/window.h"
 
+#define _PTOS_INPUT_NONE -1
+#define _PTOS_INPUT_MOUSEBEGIN 0
+#define _PTOS_INPUT_MOUSEEND 7
+#define _PTOS_INPUT_KEYBEGIN 8
+#define _PTOS_INPUT_KEYEND 166
+#define _PTOS_INPUT_KEYPADBEGIN 12
+#define _PTOS_INPUT_KEYPADEND 28
+#define _PTOS_INPUT_MODBEGIN 155
+#define _PTOS_INPUT_MODEND 162
+
 //check if the Input Code is a mouse button
-#define PTOS_INPUT_IS_MOUSE(code) code >= 0 && code <= 7
+#define PTOS_INPUT_IS_MOUSE(code) code >= _PTOS_INPUT_MOUSEBEGIN && code <= _PTOS_INPUT_MOUSEEND
 //check if the Input Code is a keyboard key
-#define PTOS_INPUT_IS_KEY(code)
+#define PTOS_INPUT_IS_KEY(code) code >= _PTOS_INPUT_KEYBEGIN && code <= _PTOS_INPUT_KEYEND
 //check if the Input Code is a keyboard modifier key
-#define PTOS_INPUT_IS_KEY_MODE(code)
+#define PTOS_INPUT_IS_KEY_MOD(code) code >= _PTOS_INPUT_MODBEGIN && code <= _PTOS_INPUT_MODEND
 //check if the Input Code is from a controller
 #define PTOS_INPUT_IS_CONTROLLER(code)
 
@@ -21,27 +31,29 @@ namespace PTOS {
 	//combined codes for all input (keyboard + mouse + controller)
 	enum InputCode {
 
-		INPUT_CODE_NONE = -1,
+		INPUT_CODE_NONE = _PTOS_INPUT_NONE,
 		
 		//Mouse Codes
 
-		INPUT_CODE_MOUSE_LEFT = 0,
+		INPUT_CODE_MOUSE_LEFT = _PTOS_INPUT_MOUSEBEGIN,
 		INPUT_CODE_MOUSE_RIGHT,
 		INPUT_CODE_MOUSE_MIDDLE,
 		INPUT_CODE_MOUSE_FOUR,
 		INPUT_CODE_MOUSE_FIVE,
 		INPUT_CODE_MOUSE_SIX,
 		INPUT_CODE_MOUSE_SEVEN,
+		INPUT_CODE_MOUSE_EIGHT = _PTOS_INPUT_MOUSEEND,
 
 		//Key Codes (loosely follows ascii)
 
-		INPUT_CODE_KEY_BACKSPACE,
+		INPUT_CODE_KEY_BACKSPACE = _PTOS_INPUT_KEYBEGIN,
 		INPUT_CODE_KEY_TAB,
 		INPUT_CODE_KEY_ENTER,
+		INPUT_CODE_KEY_ESC,
 
 		//keypad keys, resumes ascii afterwards
 
-		INPUT_CODE_KEY_KP_0,
+		INPUT_CODE_KEY_KP_0 = _PTOS_INPUT_KEYPADBEGIN,
 		INPUT_CODE_KEY_KP_1,
 		INPUT_CODE_KEY_KP_2,
 		INPUT_CODE_KEY_KP_3,
@@ -57,9 +69,8 @@ namespace PTOS {
 		INPUT_CODE_KEY_KP_MINUS,
 		INPUT_CODE_KEY_KP_PLUS,
 		INPUT_CODE_KEY_KP_ENTER,
-		INPUT_CODE_KEY_KP_EQUALS,
+		INPUT_CODE_KEY_KP_EQUALS = _PTOS_INPUT_KEYPADEND,
 
-		INPUT_CODE_KEY_ESC = 27,
 		INPUT_CODE_KEY_SPACE = 32,
 		INPUT_CODE_KEY_QUOTE = 39,
 		INPUT_CODE_KEY_COMMA = 44,
@@ -112,7 +123,6 @@ namespace PTOS {
 
 		//control keys
 
-		INPUT_CODE_KEY_SHIFT,
 		INPUT_CODE_KEY_UP,
 		INPUT_CODE_KEY_DOWN,
 		INPUT_CODE_KEY_LEFT,
@@ -142,18 +152,18 @@ namespace PTOS {
 		INPUT_CODE_KEY_NUM_LOCK,
 		INPUT_CODE_KEY_CAPS_LOCK,
 		INPUT_CODE_KEY_SCROLL_LOCK,
-		INPUT_CODE_KEY_SHIFT_LEFT,
+		INPUT_CODE_KEY_SHIFT_LEFT = _PTOS_INPUT_MODBEGIN,
 		INPUT_CODE_KEY_SHIFT_RIGHT,
 		INPUT_CODE_KEY_CONTROL_LEFT,
 		INPUT_CODE_KEY_CONTROL_RIGHT,
 		INPUT_CODE_KEY_ALT_LEFT,
 		INPUT_CODE_KEY_ALT_RIGHT,
 		INPUT_CODE_KEY_COMMAND_LEFT,
-		INPUT_CODE_KEY_COMMAND_RIGHT,
-		INPUT_CODE_KEY_WINDOWS_LEFT,
-		INPUT_CODE_KEY_WINDOWS_RIGHT,
+		INPUT_CODE_KEY_WINDOWS_LEFT = INPUT_CODE_KEY_COMMAND_LEFT, //alias for INPUT_CODE_KEY_COMMAND_LEFT
+		INPUT_CODE_KEY_COMMAND_RIGHT = _PTOS_INPUT_MODEND,
+		INPUT_CODE_KEY_WINDOWS_RIGHT = INPUT_CODE_KEY_COMMAND_RIGHT, //alias for INPUT_CODE_KEY_COMMAND_RIGHT
 		INPUT_CODE_KEY_PRINT,
-		INPUT_CODE_KEY_BREAK,
+		INPUT_CODE_KEY_PAUSE = _PTOS_INPUT_KEYEND,
 
 	};
 
@@ -186,10 +196,12 @@ namespace PTOS {
 		inline bool getHold(InputCode code) { return getCount(code) > 1; }
 		inline bool getDown(InputCode code) { return getCount(code) == 1; }
 		inline bool getUp(InputCode code) { return getCount(code) == -1; }
+		inline bool getAny(InputCode code) { return getCount(code) != 0; }
 
 		WindowInputStateMap getHoldAll();
 		WindowInputStateMap getDownAll();
 		WindowInputStateMap getUpAll();
+		WindowInputStateMap getAnyAll();
 
 		inline WindowRenderer* getRenderer() { return renderer; }
 
