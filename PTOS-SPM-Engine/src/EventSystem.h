@@ -2,22 +2,24 @@
 
 #include <vector>
 
-#include "EventLayer.h"
+#include "symbols/application.h"
+#include "symbols/eventsystem.h"
 
 namespace PTOS {
 
-	static struct EventTypeLL {
+	struct EventTypeLL {
 		EventType type;
 		EventTypeLL* next = nullptr;
 	};
 
-	class PTOS_API EventSystem {
+	class EventSystem {
 
 	public:
-		EventSystem();
+		EventSystem(Application* app);
 		~EventSystem();
 
 		bool addLayer(EventLayer* layer);
+		bool insertLayer(EventLayer* layer, float priority);
 		bool removeLayer(EventLayer* layer);
 		bool removeLayer(size_t index);
 		std::vector<EventLayer*>::const_iterator findLayer(EventLayer* layer);
@@ -38,15 +40,9 @@ namespace PTOS {
 		void removeType(EventType type);
 		void handleEvent(Event* event, EventLayer* layer, std::vector<Event*>& pg);
 
+		Application* app;
 		std::vector<EventLayer*> layers;
 		EventTypeLL* types = nullptr;
-	};
-
-	struct PTOS_API EventContext {
-		EventSystem* system = nullptr;
-		EventLayer* layer = nullptr;
-		EventListenerFunc listener = nullptr;
-		Event* event = nullptr;
 	};
 };
 

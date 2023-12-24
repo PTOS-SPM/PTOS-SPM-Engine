@@ -6,7 +6,14 @@ workspace "PTOS-SPM"
         "Release"
     }
 
-    outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+cwd = path.getabsolute(".")
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+IncludeDir = {}
+IncludeDir["GLFW"] = "PTOS-SPM-Engine/libs/glfw/include"
+IncludeDir["GLAD"] = "PTOS-SPM-Engine/libs/glad/include"
+
+include "PTOS-SPM-Engine/libs/glfw"
+include "PTOS-SPM-Engine/libs/glad"
 
 project "PTOS-SPM-Engine"
     location "PTOS-SPM-Engine"
@@ -24,7 +31,15 @@ project "PTOS-SPM-Engine"
     includedirs
     {
         "%{prj.name}/src",
-        "%{prj.name}/libs/spdlog/include"
+        "%{prj.name}/libs/spdlog/include",
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.GLAD}"
+    }
+
+    links {
+        "GLFW",
+        "GLAD",
+        "opengl32.lib"
     }
 
     filter "system:windows"
@@ -44,15 +59,15 @@ project "PTOS-SPM-Engine"
         }
 
     filter "configurations:Debug"
+        defines {"PTOS_BUILD_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
         staticruntime "off"
         runtime "Debug"
-        defines "PTOS_DEBUG"
         symbols "ON"
-
+        
     filter "configurations:Release"
+        defines "PTOS_BUILD_RELEASE"
         staticruntime "off"
         runtime "Release"
-        defines "PTOS_RELEASE"
         optimize "ON"
 
 project "TestEngine"
@@ -71,6 +86,8 @@ project "TestEngine"
     includedirs
     {
         "PTOS-SPM-Engine/libs/spdlog/include",
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.GLAD}",
         "PTOS-SPM-Engine/src"
     }
 
@@ -89,13 +106,13 @@ project "TestEngine"
         }
 
     filter "configurations:Debug"
+        defines {"PTOS_BUILD_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
         staticruntime "off"
         runtime "Debug"
-        defines "PTOS_DEBUG"
         symbols "ON"
         
-        filter "configurations:Release"
+    filter "configurations:Release"
         staticruntime "off"
         runtime "Release"
-        defines "PTOS_RELEASE"
+        defines "PTOS_BUILD_RELEASE"
         optimize "ON"

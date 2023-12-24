@@ -1,11 +1,14 @@
 #include "EventSystem.h"
+#include "EventLayer.h"
+#include "Event.h"
 #include "Log.h"
 
 #include <ostream>
 
 namespace PTOS {
 
-    EventSystem::EventSystem() {
+    EventSystem::EventSystem(Application* app) {
+        this->app = app;
         layers = std::vector<EventLayer*>();
     }
 
@@ -31,6 +34,21 @@ namespace PTOS {
             addType(layer->getTypes()[i]);
         layers.push_back(layer);
         return true;
+    }
+
+    bool EventSystem::insertLayer(EventLayer* layer, float priority) {
+        priority = priority < 1 ? priority : 1;
+        if (priority == 1)
+            return addLayer(layer); //just append
+        else {
+            for (size_t i = 0; i < layer->getTypeCount(); i++)
+                if (hasType(layer->getTypes()[i])) {
+                    //PTOS_CORE_ERR("EventType collision on layer {0}: {1}", *layer, layer->getTypes()[i]);
+                    return false;
+                }
+            size_t index = layers.size() * priority;
+            layers.insert(layers.begin() + index, layer);
+        }
     }
 
     bool EventSystem::removeLayer(EventLayer* layer) {
@@ -135,6 +153,8 @@ namespace PTOS {
 
             for (Event* event : copyQueue)
                 handleEvent(event, layer, propagateNext);
+            copyQueue.clear();
+
             for (Event* event : propagate)
                 handleEvent(event, layer, propagateNext);
 
@@ -152,7 +172,7 @@ namespace PTOS {
         EventType type = event->getType();
         auto end = layer->getListenerEnd(type);
         for (auto lst = layer->getListenerBegin(type); lst != end && event->shouldHandle(); lst++) {
-            (*lst)(EventContext{this, layer, *lst, event});
+            (*lst)(EventContext{layer, *lst, event, app});
         }
         if (event->shouldPropagate())
             pg.push_back(event);

@@ -1,6 +1,9 @@
 #Visual Studio Files
 .vs/
 *.user
+*.sln
+*.vcxproj
+*.vcxproj.filters
 
 #Build Output
 bin/

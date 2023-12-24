@@ -26,18 +26,33 @@ namespace PTOS {
 	};
 }
 
+#ifdef PTOS_LOGGING
 //Core Logger
-#define PTOS_CORE_TRACE(...)       ::PTOS::Log::getCoreLogger()->trace(__VA_ARGS__)
-#define PTOS_CORE_DEBUG(...)       ::PTOS::Log::getCoreLogger()->debug(__VA_ARGS__)
-#define PTOS_CORE_INFO(...)        ::PTOS::Log::getCoreLogger()->info(__VA_ARGS__)
-#define PTOS_CORE_WARN(...)        ::PTOS::Log::getCoreLogger()->warn(__VA_ARGS__)
-#define PTOS_CORE_ERR(...)         ::PTOS::Log::getCoreLogger()->error(__VA_ARGS__)
-#define PTOS_CORE_CRITICAL(...)    ::PTOS::Log::getCoreLogger()->critical(__VA_ARGS__)
+#define PTOS_CORE_TRACE(...)       PTOS::Log::getCoreLogger()->trace(__VA_ARGS__)
+#define PTOS_CORE_DEBUG(...)       PTOS::Log::getCoreLogger()->debug(__VA_ARGS__)
+#define PTOS_CORE_INFO(...)        PTOS::Log::getCoreLogger()->info(__VA_ARGS__)
+#define PTOS_CORE_WARN(...)        PTOS::Log::getCoreLogger()->warn(__VA_ARGS__)
+#define PTOS_CORE_ERR(...)         PTOS::Log::getCoreLogger()->error(__VA_ARGS__)
+#define PTOS_CORE_CRITICAL(...)    PTOS::Log::getCoreLogger()->critical(__VA_ARGS__)
 
 //App Logger
-#define PTOS_TRACE(...)            ::PTOS::Log::getAppLogger()->trace(__VA_ARGS__)
-#define PTOS_DEBUG(...)            ::PTOS::Log::getAppLogger()->debug(__VA_ARGS__)
-#define PTOS_INFO(...)             ::PTOS::Log::getAppLogger()->info(__VA_ARGS__)
-#define PTOS_WARN(...)             ::PTOS::Log::getAppLogger()->warn(__VA_ARGS__)
-#define PTOS_ERR(...)              ::PTOS::Log::getAppLogger()->error(__VA_ARGS__)
-#define PTOS_CRITICAL(...)         ::PTOS::Log::getAppLogger()->critical(__VA_ARGS__)
+#define PTOS_TRACE(...)            PTOS::Log::getAppLogger()->trace(__VA_ARGS__)
+#define PTOS_DEBUG(...)            PTOS::Log::getAppLogger()->debug(__VA_ARGS__)
+#define PTOS_INFO(...)             PTOS::Log::getAppLogger()->info(__VA_ARGS__)
+#define PTOS_WARN(...)             PTOS::Log::getAppLogger()->warn(__VA_ARGS__)
+#define PTOS_ERR(...)              PTOS::Log::getAppLogger()->error(__VA_ARGS__)
+#define PTOS_CRITICAL(...)         PTOS::Log::getAppLogger()->critical(__VA_ARGS__)
+#else
+#define PTOS_CORE_TRACE(...)
+#define PTOS_CORE_DEBUG(...)
+#define PTOS_CORE_INFO(...)
+#define PTOS_CORE_WARN(...)
+#define PTOS_CORE_ERR(...)
+#define PTOS_CORE_CRITICAL(...)
+#define PTOS_TRACE(...)
+#define PTOS_DEBUG(...)
+#define PTOS_INFO(...)
+#define PTOS_WARN(...)
+#define PTOS_ERR(...)
+#define PTOS_CRITICAL(...)
+#endif
