@@ -14,66 +14,16 @@ IncludeDir["GLAD"] = "PTOS-SPM-Engine/libs/glad/include"
 
 include "PTOS-SPM-Engine/libs/glfw"
 include "PTOS-SPM-Engine/libs/glad"
-
-project "PTOS-SPM-Engine"
-    location "PTOS-SPM-Engine"
-    kind "SharedLib"
-    language "C++"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs
-    {
-        "%{prj.name}/src",
-        "%{prj.name}/libs/spdlog/include",
-        "%{IncludeDir.GLFW}",
-        "%{IncludeDir.GLAD}"
-    }
-
-    links {
-        "GLFW",
-        "GLAD",
-        "opengl32.lib"
-    }
-
-    filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
-        systemversion "latest"
-
-        defines
-        {
-            "PTOS_PLATFORM_WINDOWS",
-            "PTOS_BUILD_DLL"
-        }
-
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestEngine")
-        }
-
-    filter "configurations:Debug"
-        defines {"PTOS_BUILD_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
-        staticruntime "off"
-        runtime "Debug"
-        symbols "ON"
-        
-    filter "configurations:Release"
-        defines "PTOS_BUILD_RELEASE"
-        staticruntime "off"
-        runtime "Release"
-        optimize "ON"
+include "PTOS-SPM-Engine"
 
 project "TestEngine"
     location "TestEngine"
     kind "ConsoleApp"
+    staticruntime "on"
+
     language "C++"
+    cppdialect "C++17"
+
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
@@ -96,8 +46,6 @@ project "TestEngine"
     }
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
 
         defines
@@ -107,12 +55,10 @@ project "TestEngine"
 
     filter "configurations:Debug"
         defines {"PTOS_BUILD_DEBUG", "PTOS_ASSERTS", "PTOS_LOGGING"}
-        staticruntime "off"
         runtime "Debug"
-        symbols "ON"
+        symbols "on"
         
     filter "configurations:Release"
-        staticruntime "off"
         runtime "Release"
         defines "PTOS_BUILD_RELEASE"
-        optimize "ON"
+        optimize "on"

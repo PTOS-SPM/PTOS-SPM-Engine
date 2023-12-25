@@ -1,7 +1,9 @@
 #pragma once
 
 #ifdef PTOS_PLATFORM_WINDOWS
-#ifdef PTOS_BUILD_DLL
+#if defined PTOS_BUILD_STATIC
+#define PTOS_API 
+#elif defined PTOS_BUILD_DLL
 #define PTOS_API __declspec(dllexport)
 #else
 #define PTOS_API __declspec(dllimport)
