@@ -138,7 +138,7 @@ namespace PTOS {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
 			renderer->getEventLayer()->dispatch(new WindowEvent(WINDOW_MOVE, renderer, xpos, ypos));
 		});
-		//TODO map keycodes here to PTOS/SPM keycodes https://www.glfw.org/docs/3.3/group__keys.html
+
 		glfwSetKeyCallback(win, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
 

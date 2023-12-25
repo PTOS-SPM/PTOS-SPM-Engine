@@ -20,7 +20,6 @@ namespace PTOS {
 
     template<typename T>
     Transform3<T> translate3(T x, T y, T z) {
-        //TODO figure out how to set w
         return Transform3<T>{{
             {1, 0, 0, x},
             { 0, 1, 0, y },

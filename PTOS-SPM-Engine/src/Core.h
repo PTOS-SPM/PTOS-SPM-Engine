@@ -17,3 +17,5 @@
 #define PTOS_CORE_ASSERT(x, ...)
 #define PTOS_ASSERT(x, ...)
 #endif
+
+//TODO add build flags for renderer inclusion
