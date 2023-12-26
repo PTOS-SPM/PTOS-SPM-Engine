@@ -41,6 +41,7 @@ namespace PTOS {
 		ApplicationWindows windows;
 
 		inline bool doRun() const { return run; }
+		void stop();
 
 	protected:
 		bool run = true;
