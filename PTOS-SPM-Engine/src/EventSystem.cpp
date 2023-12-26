@@ -15,11 +15,14 @@ namespace PTOS {
     EventSystem::~EventSystem() {
         for (EventLayer* layer : layers)
             delete layer;
-        EventTypeLL* iter = types;
-        EventTypeLL* todel = types;
-        while (iter != nullptr) {
-            iter = todel->next;
-            delete todel;
+        if (types) {
+            EventTypeLL* iter = types;
+            EventTypeLL* todel = types;
+            while (iter != nullptr) {
+                iter = todel->next;
+                delete todel;
+                todel = iter;
+            }
         }
         layers.clear();
     }
@@ -36,7 +39,7 @@ namespace PTOS {
         return true;
     }
 
-    bool EventSystem::insertLayer(EventLayer* layer, float priority) {
+    bool EventSystem::insertLayer(EventLayer* layer, double priority) {
         priority = priority < 1 ? priority : 1;
         if (priority == 1)
             return addLayer(layer); //just append
@@ -46,9 +49,10 @@ namespace PTOS {
                     //PTOS_CORE_ERR("EventType collision on layer {0}: {1}", *layer, layer->getTypes()[i]);
                     return false;
                 }
-            size_t index = layers.size() * priority;
+            size_t index = (size_t)(layers.size() * priority);
             layers.insert(layers.begin() + index, layer);
         }
+        return true;
     }
 
     bool EventSystem::removeLayer(EventLayer* layer) {
@@ -100,6 +104,7 @@ namespace PTOS {
         }
         //add to end
         prev->next = new EventTypeLL{ type, nullptr };
+        return true;
     }
 
     void EventSystem::removeType(EventType type) {

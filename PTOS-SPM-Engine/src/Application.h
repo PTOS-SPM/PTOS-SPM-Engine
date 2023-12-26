@@ -70,9 +70,12 @@ namespace PTOS {
 
 	//define hook-in events
 
+#pragma warning(push)
+#pragma warning(disable:4003)
 	_PTOS_HOOKDEF_CREATE_APPLICATION();
 	_PTOS_HOOKDEF_START_APPLICATION();
 	_PTOS_HOOKDEF_END_APPLICATION();
 	_PTOS_HOOKDEF_PRE_UPDATE();
 	_PTOS_HOOKDEF_POST_UPDATE();
+#pragma warning(pop)
 }

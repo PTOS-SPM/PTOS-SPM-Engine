@@ -19,7 +19,7 @@
 		void setSize(const WindowSize& size) override; \
 		void setTitle(const std::string& title) override; \
 		inline std::string getRendererName() override { return #name; } \
-		inline void* getImplWindow() override;
+		void* getImplWindow() override;
 
 //sets width=0, height=0, bytes=0
 #define PTOS_GLFW_ICON_EMPTY {0,0,0}
@@ -82,7 +82,7 @@ namespace PTOS {
 		virtual void setTitle(const std::string& title) = 0;
 		virtual bool isCreated() = 0;
 		virtual std::string getRendererName() = 0;
-		virtual inline void* getImplWindow() = 0;
+		virtual void* getImplWindow() = 0;
 
 		inline EventLayer* getEventLayer() const { return eventLayer; }
 

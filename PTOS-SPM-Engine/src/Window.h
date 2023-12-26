@@ -23,7 +23,7 @@ namespace PTOS {
 		inline int getHeight() const { return renderer->getHeight(); }
 		inline WindowSize getSize() const { return renderer->getSize(); }
 		inline std::string getTitle() const { return renderer->getTitle(); }
-		inline float getFramerate() const { return framerate == 0 ? 0 : (1E+9 / framerate); }
+		inline float getFramerate() const { return framerate == 0 ? 0 : (1E+9f / framerate); }
 		
 		inline bool isOpen() { return renderer->isCreated(); }
 		inline bool isShutdown() { return renderer->getShutdown(); }
@@ -32,7 +32,7 @@ namespace PTOS {
 		inline void setHeight(int height) { renderer->setHeight(height); }
 		inline void setSize(const WindowSize& size) { renderer->setSize(size); }
 		inline void setTitle(const std::string& title) { renderer->setTitle(title); }
-		inline void setFramerate(float framerate) { this->framerate = framerate == 0 ? 0 : (1E+9 / framerate); }
+		inline void setFramerate(float framerate) { this->framerate = framerate == 0 ? 0 : (1E+9f / framerate); }
 
 	private:
 		WindowRenderer* renderer;
