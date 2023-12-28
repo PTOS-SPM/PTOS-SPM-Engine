@@ -19,7 +19,7 @@ namespace PTOS {
 		~EventSystem();
 
 		bool addLayer(EventLayer* layer);
-		bool insertLayer(EventLayer* layer, float priority);
+		bool insertLayer(EventLayer* layer, double priority);
 		bool removeLayer(EventLayer* layer);
 		bool removeLayer(size_t index);
 		std::vector<EventLayer*>::const_iterator findLayer(EventLayer* layer);

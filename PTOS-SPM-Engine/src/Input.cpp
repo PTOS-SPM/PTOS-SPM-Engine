@@ -3,15 +3,13 @@
 #include "WindowEvent.h"
 #include "WindowRenderer.h"
 
-//TODO convert windowevents and renderers to use InputCode instead of navtive keycodes
 #define _PTOS_INPUT_HANDLE_EVENT(codeMethod, state) \
 	WindowEvent* event = (WindowEvent*)ctx.event; \
 	WindowRenderer* renderer = event->getRenderer(); \
 	statemap[renderer][(InputCode)event-> codeMethod ()] = InputState(state, true); \
 	event->stopHandle();
 
-//DEBUG
-#include "Log.h"
+
 namespace PTOS {
 
 	InputState::InputState(long long count, bool setFrame) {

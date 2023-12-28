@@ -73,6 +73,10 @@ namespace PTOS {
 		windows.clear();
 	}
 
+	void Application::stop() {
+		run = false;
+	}
+
 	//Application Context Manager
 
 	Window* ApplicationContextManager::newWindow(int width, int height, std::string& title, void* icon, WindowRenderer* (*rendererCallback)(EventLayer*)) {

@@ -8,6 +8,7 @@ namespace PTOS {
 	public:
 		Event(EventType type, bool propagate, bool handle);
 		Event(EventType type) : Event(type, true, true) {}
+		~Event() {}
 
 		inline bool shouldPropagate() const { return propagate; }
 		inline bool shouldHandle() const { return handle; }
