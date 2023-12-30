@@ -1,5 +1,4 @@
 #include <PTOS.h>
-#include <sstream>
 
 PTOS::Window* mainWindow = nullptr;
 
@@ -54,7 +53,7 @@ void onStart(PTOS::ApplicationContextManager& ctx) {
 
 PTOS_HOOK_CREATE_APPLICATION_DEFAULT
 
-PTOS_HOOK_START_APPLICATION{
+PTOS_HOOK_START_APPLICATION {
 	onStart(ctx);
 }
 

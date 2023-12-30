@@ -17,9 +17,11 @@
 #ifdef PTOS_ASSERTS
 	#define PTOS_CORE_ASSERT(x, ...) { if(!(x)) { PTOS_CORE_ERR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 	#define PTOS_ASSERT(x, ...) { if(!(x)) { PTOS_ERR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); }
+	#define PTOS_CORE_VERIFY(x, ...) { auto y = x; if(!(x)) { PTOS_CORE_ERR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define PTOS_VERIFY(x, ...) { auto y = x; if(!(x)) { PTOS_ERR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); }
 #else
 	#define PTOS_CORE_ASSERT(x, ...)
 	#define PTOS_ASSERT(x, ...)
+	#define PTOS_CORE_VERIFY(x, ...) x
+	#define PTOS_VERIFY(x, ...) x
 #endif
-
-//TODO add build flags for renderer inclusion

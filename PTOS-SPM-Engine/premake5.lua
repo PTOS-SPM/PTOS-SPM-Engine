@@ -1,5 +1,5 @@
 project "PTOS-SPM-Engine"
-    location "PTOS-SPM-Engine"
+    location (cwd .. "/%{prj.name}")
     kind "StaticLib"
     staticruntime "on"
     

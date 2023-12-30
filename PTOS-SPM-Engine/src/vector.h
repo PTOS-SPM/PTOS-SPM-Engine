@@ -1,32 +1,22 @@
 #pragma once
 
+#include "symbols/math.h"
+#include "mathoperators.h"
+
 #include <cmath>
 
 //assume radians for any angles
-
-#define PTOS_ZERO_DIVIDE(n, d) (d == 0 ? 0 : (n/d))
-
 
 namespace PTOS {
 
 	//forward declare vectors to allow access to eachother
 
-	template <typename T> struct Vector2;
-	template <typename T> struct Vector3;
-	template <typename T> struct Vector4;
-	typedef Vector2<double> vec2;
-	typedef Vector2<float> vec2f;
-	typedef Vector3<double> vec3;
-	typedef Vector3<float> vec3f;
-	typedef Vector4<double> vec4;
-	typedef Vector4<float> vec4f;
-
 	template<typename T> struct Vector2 {
-		static inline Vector2<T> up() { return Vector2<T>(0, 1 ); }
-		static inline Vector2<T> down() { return Vector2<T>(0, -1); }
-		static inline Vector2<T> right() { return Vector2<T>(1, 0); }
-		static inline Vector2<T> left() { return Vector2<T>(-1, 0); }
-		static inline Vector2<T> one() { return Vector2<T>(1, 1); }
+		static inline Vector2<T> up() { return Vector2<T>(0.0, 1.0); }
+		static inline Vector2<T> down() { return Vector2<T>(0.0, -1.0); }
+		static inline Vector2<T> right() { return Vector2<T>(1.0, 0.0); }
+		static inline Vector2<T> left() { return Vector2<T>(-1.0, 0.0); }
+		static inline Vector2<T> one() { return Vector2<T>(1.0, 1.0); }
 		
 		static inline T angle(Vector2<T>& lv, Vector2<T>& rv) {
 			return atan2(rv[1] * lv[0] - rv[0] * lv[1], rv[0] * lv[0] + rv[1] * lv[1]);
@@ -126,13 +116,13 @@ namespace PTOS {
 	};
 
 	template<typename T> struct Vector3 {
-		static inline Vector3<T> up() { return Vector3<T>(0, 1, 0); }
-		static inline Vector3<T> down() { return Vector3<T>(0, -1, 0); }
-		static inline Vector3<T> right() { return Vector3<T>(1, 0, 0); }
-		static inline Vector3<T> left() { return Vector3<T>(-1, 0, 0); }
-		static inline Vector3<T> forward() { return Vector3<T>(0, 0, 1); }
-		static inline Vector3<T> back() { return Vector3<T>(0, 0, -1); }
-		static inline Vector3<T> one() { return Vector3<T>(1, 1, 1); }
+		static inline Vector3<T> up() { return Vector3<T>(0.0, 1.0, 0.0); }
+		static inline Vector3<T> down() { return Vector3<T>(0.0, -1.0, 0.0); }
+		static inline Vector3<T> right() { return Vector3<T>(1.0, 0.0, 0.0); }
+		static inline Vector3<T> left() { return Vector3<T>(-1.0, 0.0, 0.0); }
+		static inline Vector3<T> forward() { return Vector3<T>(0.0, 0.0, 1.0); }
+		static inline Vector3<T> back() { return Vector3<T>(0.0, 0.0, -1.0); }
+		static inline Vector3<T> one() { return Vector3<T>(1.0, 1.0, 1.0); }
 
 		static inline T angle(Vector3<T>& lv, Vector3<T>& rv) {
 			return acos(dot(lv, rv) / (lv.magnitude() * rv.magnitude()));
@@ -184,6 +174,8 @@ namespace PTOS {
 		inline T& x() { return data[0]; }
 		inline T& y() { return data[1]; }
 		inline T& z() { return data[2]; }
+		//if using Vector3 as a Vector2 with a w component
+		inline T& w() { return data[2]; }
 
 		inline T& r() { return data[0]; }
 		inline T& g() { return data[1]; }
@@ -241,13 +233,13 @@ namespace PTOS {
 	};
 
 	template<typename T> struct Vector4 {
-		static inline Vector4<T> up() { return Vector4<T>(0, 1, 0, 0); }
-		static inline Vector4<T> down() { return Vector4<T>(0, -1, 0, 0); }
-		static inline Vector4<T> right() { return Vector4<T>(1, 0, 0, 0); }
-		static inline Vector4<T> left() { return Vector4<T>(-1, 0, 0, 0); }
-		static inline Vector4<T> forward() { return Vector4<T>(0, 0, 1, 0); }
-		static inline Vector4<T> back() { return Vector4<T>(0, 0, -1, 0); }
-		static inline Vector4<T> one() { return Vector4<T>(1, 1, 1, 1); }
+		static inline Vector4<T> up() { return Vector4<T>(0.0, 1.0, 0.0, 0.0); }
+		static inline Vector4<T> down() { return Vector4<T>(0.0, -1.0, 0.0, 0.0); }
+		static inline Vector4<T> right() { return Vector4<T>(1.0, 0.0, 0.0, 0.0); }
+		static inline Vector4<T> left() { return Vector4<T>(-1.0, 0.0, 0.0, 0.0); }
+		static inline Vector4<T> forward() { return Vector4<T>(0.0, 0.0, 1.0, 0.0); }
+		static inline Vector4<T> back() { return Vector4<T>(0.0, 0.0, -1.0, 0.0); }
+		static inline Vector4<T> one() { return Vector4<T>(1.0, 1.0, 1.0, 1.0); }
 
 		static inline T angle(Vector4<T>& lv, Vector4<T>& rv) {
 			return acos(dot(lv, rv) / (lv.magnitude() * rv.magnitude()));
@@ -270,7 +262,7 @@ namespace PTOS {
 			data[3] = w;
 		}
 
-		Vector4(const T(data)[4]) {
+		Vector4(const T(&data)[4]) {
 			memcpy(&this->data, &data, sizeof(T) * 4);
 		}
 
