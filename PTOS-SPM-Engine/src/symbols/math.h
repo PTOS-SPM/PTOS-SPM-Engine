@@ -6,9 +6,9 @@
 
 namespace PTOS {
 
-	template <typename T> struct Vector2;
-	template <typename T> struct Vector3;
-	template <typename T> struct Vector4;
+	template <typename T> PTOS_API struct Vector2;
+	template <typename T> PTOS_API struct Vector3;
+	template <typename T> PTOS_API struct Vector4;
 	typedef Vector2<double> vec2;
 	typedef Vector2<float> vec2f;
 	typedef Vector3<double> vec3;
@@ -17,9 +17,9 @@ namespace PTOS {
 	typedef Vector4<float> vec4f;
 	typedef vec3 euler;
 
-	template<typename T> struct Matrix2;
-	template<typename T> struct Matrix3;
-	template<typename T> struct Matrix4;
+	template<typename T> PTOS_API struct Matrix2;
+	template<typename T> PTOS_API struct Matrix3;
+	template<typename T> PTOS_API struct Matrix4;
 	typedef Matrix2<double> mat2;
 	typedef Matrix2<float> mat2f;
 	typedef Matrix3<double> mat3;

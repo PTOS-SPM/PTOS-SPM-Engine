@@ -1,11 +1,21 @@
 #pragma once
 
+#include "GLFW/glfw3.h"
 #include <unordered_map>
 
+#include "Input.h"
 #include "WindowRenderer.h"
 
+//DEBUG
+#include "GLFWVertexArray.h"
+#include "GLFWBuffer.h"
+#include "GLFWShader.h"
+
+//sets width=0, height=0, bytes=0
+#define PTOS_GLFW_ICON_EMPTY {0,0,0}
+
 namespace PTOS {
-	class PTOS_API GLFWRenderer : public WindowRenderer {
+	class GLFWRenderer : public WindowRenderer {
 	public:
 		PTOS_OVERRIDE_WINDOW_RENDERER_METHODS(GLFWRenderer)
 		inline bool isCreated() override { return win != nullptr; }
@@ -14,6 +24,13 @@ namespace PTOS {
 	private:
 		GLFWimage icon = PTOS_GLFW_ICON_EMPTY;
 		GLFWwindow* win = nullptr;
+
+		//DEBUG
+		GLFWVertexArray vertexArray;
+		GLFWVertexBuffer vertexBuffer;
+		GLFWIndexBuffer indexBuffer;
+		GLFWShader* shader = nullptr;
+
 	};
 
 	const std::unordered_map<int, InputCode> codeMapGLFW = {

@@ -44,7 +44,7 @@ namespace PTOS {
 		inline Matrix2<T> operator / (Matrix2<T>& mat) {
 			return Matrix2<T>({
 				{ PTOS_ZERO_DIVIDE(mat[0][0], data[0][0]) + PTOS_ZERO_DIVIDE(mat[1][0], data[0][1]), PTOS_ZERO_DIVIDE(mat[0][1], data[0][0]) + PTOS_ZERO_DIVIDE(mat[1][1], data[0][1]) },
-				{ PTOS_ZERO_DIVIDE(mat[1][0], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][0], data[1][0]), PTOS_ZERO_DIVIDE(mat[1][1], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][1], data[1][0]) },
+				{ PTOS_ZERO_DIVIDE(mat[1][0], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][0], data[1][0]), PTOS_ZERO_DIVIDE(mat[1][1], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][1], data[1][0]) }
 			});
 		}
 

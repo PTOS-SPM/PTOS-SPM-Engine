@@ -1,10 +1,15 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include "symbols/eventsystem.h"
 #include "symbols/window.h"
 
+/**
+
+Methods not overriden:
+
+isCreated
+
+*/
 #define PTOS_OVERRIDE_WINDOW_RENDERER_METHODS(name) \
 		name(EventLayer* eventLayer) : WindowRenderer(eventLayer) {} \
 		~name() { shutdown(); } \
@@ -19,10 +24,7 @@
 		void setSize(const WindowSize& size) override; \
 		void setTitle(const std::string& title) override; \
 		inline std::string getRendererName() override { return #name; } \
-		void* getImplWindow() override;
-
-//sets width=0, height=0, bytes=0
-#define PTOS_GLFW_ICON_EMPTY {0,0,0}
+		void* getImplWindow() override; \
 
 namespace PTOS {
 

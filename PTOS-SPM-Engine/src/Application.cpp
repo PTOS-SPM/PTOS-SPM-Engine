@@ -1,5 +1,8 @@
 #include "Application.h"
+#include "ApplicationEvent.h"
 #include "EventLayer.h"
+#include "EventSystem.h"
+#include "Window.h"
 #include "WindowRenderer.h"
 #include "WindowEvent.h"
 

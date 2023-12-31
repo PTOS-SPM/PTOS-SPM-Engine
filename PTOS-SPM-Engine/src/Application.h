@@ -1,11 +1,12 @@
 #pragma once
 
+#include "string"
 #include <vector>
 
 #include "symbols/application.h"
-#include "EventSystem.h"
+#include "symbols/eventsystem.h"
+#include "symbols/window.h"
 #include "Hooks.h"
-#include "Window.h"
 
 namespace PTOS {
 
@@ -71,6 +72,7 @@ namespace PTOS {
 
 	//define hook-in events
 
+	//if you get a warning about a function definition not being found, its because intellisense is mistaking the macros for functions due to the semicolons
 #pragma warning(push)
 #pragma warning(disable:4003)
 	_PTOS_HOOKDEF_CREATE_APPLICATION();

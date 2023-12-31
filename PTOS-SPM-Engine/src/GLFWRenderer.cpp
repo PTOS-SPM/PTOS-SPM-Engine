@@ -1,13 +1,14 @@
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "Event.h"
 #include "EventLayer.h"
 #include "Input.h"
 #include "GLFWRenderer.h"
 #include "Log.h"
+#include "vector.h"
 #include "WindowEvent.h"
 #include "WindowRenderer.h"
-
 
 
 static void glfwErrorCallback(int code, const char* description) {
@@ -29,13 +30,13 @@ namespace PTOS {
 
 	void GLFWRenderer::setWidth(int width) {
 		glfwSetWindowSize(win, width, getHeight());
-		PTOS_CORE_TRACE("GLFW WindowRenderer \{0}\": width {1} -> {2}", title, this->size.width, width);
+		PTOS_CORE_TRACE("GLFW WindowRenderer \"{0}\": width {1} -> {2}", title, this->size.width, width);
 		this->size.width = width;
 	}
 
 	void GLFWRenderer::setHeight(int height) {
 		glfwSetWindowSize(win, getWidth(), height);
-		PTOS_CORE_TRACE("GLFW WindowRenderer \{0}\": height {1} -> {2}", title, this->size.height, height);
+		PTOS_CORE_TRACE("GLFW WindowRenderer \"{0}\": height {1} -> {2}", title, this->size.height, height);
 		this->size.height = height;
 	}
 
@@ -60,7 +61,22 @@ namespace PTOS {
 	}
 
 	void GLFWRenderer::update() {
+		glfwMakeContextCurrent(win);
+
+		//clear screen
+		glClearColor((float)0x33/0xff, (float)0x33/0xff, (float)0x33/0xff, 1.0f); //DEBUG color, set as some sort of attribute later
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		//draw
+		//DEBUG
+		shader->bind();
+		vertexArray.bind();
+		glDrawElements(GL_TRIANGLES, indexBuffer.getCount(), GL_UNSIGNED_INT, nullptr);
+
+		//check for events
 		glfwPollEvents();
+
+		//swap buffers
 		glfwSwapBuffers(win);
 		eventLayer->dispatch(new WindowEvent(WINDOW_UPDATE, this));
 	}
@@ -114,6 +130,7 @@ namespace PTOS {
 		//init window with values stored in WindowRenderer
 		win = glfwCreateWindow(size.width, size.height, title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(win);
+		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		glfwSetWindowUserPointer(win, this);
 		setVsync(VSYNC_DEFAULT);
 		if (icon.width > 0 && icon.height > 0)
@@ -173,6 +190,75 @@ namespace PTOS {
 			GLFWRenderer* renderer = (GLFWRenderer*)glfwGetWindowUserPointer(window);
 			renderer->getEventLayer()->dispatch(new WindowEvent(WINDOW_MOUSE_MOVE, renderer, xpos, ypos));
 		});
+
+		//generate arrays and buffers
+		//DEBUG
+
+		vertexArray.create();
+		vertexArray.bind();
+
+		float pps[3 * 7] = {
+		   -0.5f,-0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			0.5f,-0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		};
+
+		vertexBuffer.create((float*)pps, sizeof(pps));
+
+		BufferLayout layout = {
+			{ BuffElmType::FLOAT(3), "_position" },
+			{ BuffElmType::FLOAT(4), "_color" }
+		};
+		vertexBuffer.setLayout(layout);
+		vertexArray.addVertexBuffer(&vertexBuffer);
+
+		unsigned int indecies[3] = { 0, 1, 2 };
+		indexBuffer.create(indecies, sizeof(indecies));
+		vertexArray.setIndexBuffer(&indexBuffer);
+
+
+		std::string vertexSrc = R"(
+
+#version 330 core
+
+layout(location = 0) in vec3 _position;
+layout(location = 1) in vec4 _color;
+
+out vec3 outpos;
+out vec4 vcolor;
+			
+void main()
+{
+	outpos = _position;
+	vcolor = _color;
+	gl_Position = vec4(_position, 1.0);
+
+}
+)";
+		std::string pixelSrc = R"(
+
+#version 330 core
+
+layout(location = 0) out vec4 color;
+
+in vec3 outpos;
+in vec4 vcolor;
+			
+void main()
+{
+	
+	color = vec4(outpos * 0.5 + 0.5, 1.0);
+	color = vcolor;
+}
+)";
+
+		std::string src[] = { vertexSrc, pixelSrc };
+		int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+
+		shader = GLFWShader::compile(src, types, sizeof(src) / sizeof(src[0]));
+
+		//DEBUG end
+
 		PTOS_CORE_INFO("GLFW WindowRenderer \"{0}\" created", title);
 	}
 

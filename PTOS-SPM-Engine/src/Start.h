@@ -10,8 +10,6 @@
 
 #include "Hooks.h"
 
-#include <iostream>
-
 extern PTOS_HOOK_CREATE_APPLICATION;
 extern PTOS_HOOK_START_APPLICATION;
 extern PTOS_HOOK_END_APPLICATION;
@@ -47,7 +45,7 @@ int main(int argc, char** argv) {
 
 	PTOS::EventSystem* esys = initEventSystem(app);
 
-	PTOS::ApplicationContextManager appCtxM(PTOS::ApplicationContext{app, esys});
+	PTOS::ApplicationContextManager appCtxM(PTOS::ApplicationContext{ app, esys });
 
 	PTOS_CORE_TRACE("Starting Application");
 	PTOS::PTOS_HOOKNAME_START_APPLICATION(appCtxM);
@@ -57,7 +55,7 @@ int main(int argc, char** argv) {
 		PTOS::PTOS_HOOKNAME_PRE_UPDATE(appCtxM);
 
 		//handle events
-		esys->handle();
+		esys->handle(); //NOTE: while windows only update at their given framerate, the Event System is still being handled every iteration
 
 		//handle windows
 		app->windows.handle();

@@ -9,8 +9,6 @@
 
 namespace PTOS {
 
-	//forward declare vectors to allow access to eachother
-
 	template<typename T> struct Vector2 {
 		static inline Vector2<T> up() { return Vector2<T>(0.0, 1.0); }
 		static inline Vector2<T> down() { return Vector2<T>(0.0, -1.0); }
@@ -59,6 +57,8 @@ namespace PTOS {
 
 		inline T& x() { return data[0]; }
 		inline T& y() { return data[1]; }
+
+		inline operator T* () { return (T*)data; }
 
 		inline T operator [] (int index) {
 			return data[index];
@@ -180,6 +180,8 @@ namespace PTOS {
 		inline T& r() { return data[0]; }
 		inline T& g() { return data[1]; }
 		inline T& b() { return data[2]; }
+		
+		inline operator T* () { return (T*)data; }
 
 		inline T operator [] (int index) {
 			return data[index];
@@ -299,6 +301,8 @@ namespace PTOS {
 		inline T& g() { return data[1]; }
 		inline T& b() { return data[2]; }
 		inline T& a() { return data[3]; }
+
+		inline operator T* () { return (T*)data; }
 
 		inline T operator [] (int index) {
 			return data[index];
