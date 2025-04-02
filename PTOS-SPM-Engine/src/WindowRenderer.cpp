@@ -1,17 +1,8 @@
-#include <iostream>
 #include "WindowRenderer.h"
 
 namespace PTOS {
-
-	WindowRenderer::WindowRenderer(EventLayer* eventLayer) {
+	WindowRenderer::WindowRenderer(EventSystem* esys, EventLayer* eventLayer) {
+		this->esys = esys;
 		this->eventLayer = eventLayer;
-		vsync = VSYNC_DEFAULT;
 	}
-
-}
-
-std::ostream& operator<< (std::ostream& out, PTOS::WindowRenderer& renderer) {
-	return out << "<" << renderer.getRendererName() << "\"" << renderer.getTitle()
-		<< "\" (" << renderer.getWidth() << "x" << renderer.getHeight() << ") at "
-		<< &renderer << ">";
 }

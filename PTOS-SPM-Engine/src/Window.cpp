@@ -1,39 +1,42 @@
-#include <iostream>
-
 #include "Window.h"
-#include "WindowRenderer.h"
+#include "GLFWShader.h"
+#include "GLFWWindowRenderer.h"
 
 
 namespace PTOS {
-	Window::Window(const WindowProperties& props, WindowRenderer* renderer) {
+	Window::Window(const WindowProperties& props, WindowRenderer* windowRenderer, Renderer* renderer) {
+		this->windowRenderer = windowRenderer;
 		this->renderer = renderer;
-		renderer->init(props);
+		windowRenderer->init(props);
 	}
-	
+
 	Window::~Window() {
+		delete windowRenderer;
 		delete renderer;
 	}
 
 	void Window::open() {
-		renderer->create();
+		windowRenderer->create();
 	}
 
 	void Window::close() {
-		renderer->destroy();
+		windowRenderer->destroy();
 	}
 
 	bool Window::update() {
-		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - lastFrame);
+		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - windowRenderer->getLastFrame());
 		if (duration.count() >= framerate) {
-			renderer->update();
-			lastFrame = std::chrono::high_resolution_clock::now();
+			windowRenderer->bind();
+			
+			renderer->setClearColor(rgbaHexToP(0x33, 0x33, 0x33)); //DEBUG color, set as some sort of attribute later
+			renderer->clear();
+
+			renderer->submit(scene);
+
+			windowRenderer->onUpdate();
+
 			return true;
 		}
 		return false;
 	}
-}
-
-std::ostream& operator<< (std::ostream& out, PTOS::Window& window) {
-	return out << "<Window \"" << window.getTitle() << "\" (" << window.getWidth()
-		<< "x" << window.getHeight() << ") at " << &window << ">";
 }

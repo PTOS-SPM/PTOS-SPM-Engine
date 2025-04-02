@@ -1,47 +1,38 @@
 #pragma once
 
 #include "Core.h"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <spdlog/fmt/ostr.h>
 
-namespace PTOS {
-	class PTOS_API Log {
-	public:
-		static void init(spdlog::level::level_enum coreLevel, spdlog::level::level_enum appLevel, const std::string &appLoggerName);
-		static void init(const std::string &appLoggerName);
-		static void init(spdlog::level::level_enum coreLevel, spdlog::level::level_enum appLevel);
-		static void init();
-		static inline std::shared_ptr<spdlog::logger>& getCoreLogger(void) { return coreLogger; }
-		static inline std::shared_ptr<spdlog::logger>& getAppLogger(void) { return appLogger; }
+namespace PTOS::Log {
 
-	//should not be instantiated
-	private:
+	extern std::shared_ptr<spdlog::logger> coreLogger;
+	extern std::shared_ptr<spdlog::logger> appLogger;
 
-		static std::shared_ptr<spdlog::logger> coreLogger;
-		static std::shared_ptr<spdlog::logger> appLogger;
-
-		Log() {}
-		~Log() {}
-	};
+	PTOS_API void init(spdlog::level::level_enum coreLevel, spdlog::level::level_enum appLevel, const std::string& appLoggerName);
+	PTOS_API void init(const std::string& appLoggerName);
+	PTOS_API void init(spdlog::level::level_enum coreLevel, spdlog::level::level_enum appLevel);
+	PTOS_API void init();
 }
 
 #ifdef PTOS_LOGGING
 //Core Logger
-#define PTOS_CORE_TRACE(...)       PTOS::Log::getCoreLogger()->trace(__VA_ARGS__)
-#define PTOS_CORE_DEBUG(...)       PTOS::Log::getCoreLogger()->debug(__VA_ARGS__)
-#define PTOS_CORE_INFO(...)        PTOS::Log::getCoreLogger()->info(__VA_ARGS__)
-#define PTOS_CORE_WARN(...)        PTOS::Log::getCoreLogger()->warn(__VA_ARGS__)
-#define PTOS_CORE_ERR(...)         PTOS::Log::getCoreLogger()->error(__VA_ARGS__)
-#define PTOS_CORE_CRITICAL(...)    PTOS::Log::getCoreLogger()->critical(__VA_ARGS__)
+#define PTOS_CORE_TRACE(...)       PTOS::Log::coreLogger->trace(__VA_ARGS__)
+#define PTOS_CORE_DEBUG(...)       PTOS::Log::coreLogger->debug(__VA_ARGS__)
+#define PTOS_CORE_INFO(...)        PTOS::Log::coreLogger->info(__VA_ARGS__)
+#define PTOS_CORE_WARN(...)        PTOS::Log::coreLogger->warn(__VA_ARGS__)
+#define PTOS_CORE_ERR(...)         PTOS::Log::coreLogger->error(__VA_ARGS__)
+#define PTOS_CORE_CRITICAL(...)    PTOS::Log::coreLogger->critical(__VA_ARGS__)
 
 //App Logger
-#define PTOS_TRACE(...)            PTOS::Log::getAppLogger()->trace(__VA_ARGS__)
-#define PTOS_DEBUG(...)            PTOS::Log::getAppLogger()->debug(__VA_ARGS__)
-#define PTOS_INFO(...)             PTOS::Log::getAppLogger()->info(__VA_ARGS__)
-#define PTOS_WARN(...)             PTOS::Log::getAppLogger()->warn(__VA_ARGS__)
-#define PTOS_ERR(...)              PTOS::Log::getAppLogger()->error(__VA_ARGS__)
-#define PTOS_CRITICAL(...)         PTOS::Log::getAppLogger()->critical(__VA_ARGS__)
+#define PTOS_TRACE(...)            PTOS::Log::appLogger->trace(__VA_ARGS__)
+#define PTOS_DEBUG(...)            PTOS::Log::appLogger->debug(__VA_ARGS__)
+#define PTOS_INFO(...)             PTOS::Log::appLogger->info(__VA_ARGS__)
+#define PTOS_WARN(...)             PTOS::Log::appLogger->warn(__VA_ARGS__)
+#define PTOS_ERR(...)              PTOS::Log::appLogger->error(__VA_ARGS__)
+#define PTOS_CRITICAL(...)         PTOS::Log::appLogger->critical(__VA_ARGS__)
 #else
 #define PTOS_CORE_TRACE(...)
 #define PTOS_CORE_DEBUG(...)

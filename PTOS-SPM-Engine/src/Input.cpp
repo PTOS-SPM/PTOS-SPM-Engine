@@ -1,13 +1,12 @@
-#include "EventLayer.h"
+#include "EventSystem.h"
 #include "Input.h"
-#include "WindowEvent.h"
+#include "Window.h"
 #include "WindowRenderer.h"
 
-#define _PTOS_INPUT_HANDLE_EVENT(codeMethod, state) \
-	WindowEvent* event = (WindowEvent*)ctx.event; \
-	WindowRenderer* renderer = event->getRenderer(); \
-	statemap[renderer][(InputCode)event-> codeMethod ()] = InputState(state, true); \
-	event->stopHandle();
+#define _PTOS_INPUT_HANDLE_EVENT(state) \
+	WindowEvent* event = (WindowEvent*)ctx.event.data; \
+	statemap[event->windowRenderer][event->code] = InputState(state, true); \
+	return {};
 
 
 namespace PTOS {
@@ -19,14 +18,14 @@ namespace PTOS {
 
 	InputStateMap Input::statemap;
 
-	Input::Input(WindowRenderer* renderer) {
-		this->renderer = renderer;
+	Input::Input(WindowRenderer* windowRenderer) {
+		this->windowRenderer = windowRenderer;
 	}
 
 	WindowInputStateMap Input::getHoldAll() {
 		WindowInputStateMap rtv;
-		if (!statemap.count(renderer)) return rtv;
-		for (auto &pair : statemap[renderer])
+		if (!statemap.count(windowRenderer)) return rtv;
+		for (auto& pair : statemap[windowRenderer])
 			if (pair.second.count > 1)
 				rtv[pair.first] = pair.second;
 		return rtv;
@@ -34,8 +33,8 @@ namespace PTOS {
 
 	WindowInputStateMap Input::getDownAll() {
 		WindowInputStateMap rtv;
-		if (!statemap.count(renderer)) return rtv;
-		for (auto &pair : statemap[renderer])
+		if (!statemap.count(windowRenderer)) return rtv;
+		for (auto& pair : statemap[windowRenderer])
 			if (pair.second.count == 1)
 				rtv[pair.first] = pair.second;
 		return rtv;
@@ -43,8 +42,8 @@ namespace PTOS {
 
 	WindowInputStateMap Input::getUpAll() {
 		WindowInputStateMap rtv;
-		if (!statemap.count(renderer)) return rtv;
-		for (auto &pair : statemap[renderer])
+		if (!statemap.count(windowRenderer)) return rtv;
+		for (auto& pair : statemap[windowRenderer])
 			if (pair.second.count == -1)
 				rtv[pair.first] = pair.second;
 		return rtv;
@@ -52,57 +51,58 @@ namespace PTOS {
 
 	WindowInputStateMap Input::getAnyAll() {
 		WindowInputStateMap rtv;
-		if (!statemap.count(renderer)) return rtv;
-		for (auto& pair : statemap[renderer])
+		if (!statemap.count(windowRenderer)) return rtv;
+		for (auto& pair : statemap[windowRenderer])
 			if (pair.second.count != 0)
 				rtv[pair.first] = pair.second;
 		return rtv;
 	}
 
-	void Input::onWindowUpdate(EventContext& ctx) {
-		WindowEvent* event = (WindowEvent*)ctx.event;
-		WindowRenderer* renderer = event->getRenderer();
+	EventResult Input::onWindowUpdate(const EventContext& ctx) {
+		WindowEvent* event = (WindowEvent*)ctx.event.data;
+		WindowRenderer* windowRenderer = event->windowRenderer;
+		if (!Input::statemap.count(windowRenderer))
+			return {};
 
-		if (!Input::statemap.count(renderer)) return;
-
-		for (auto &pair : Input::statemap[renderer]) {
+		for (auto& pair : Input::statemap[windowRenderer]) {
 			if (pair.second.setFrame)
-				Input::statemap[renderer][pair.first].setFrame = false;
+				Input::statemap[windowRenderer][pair.first].setFrame = false;
 			else if (pair.second.count != 0)
-				Input::statemap[renderer][pair.first].count += 1;
+				Input::statemap[windowRenderer][pair.first].count += 1;
 		}
+		return {};
 	}
 
-	void Input::onWindowKeyDown(EventContext& ctx) {
-		_PTOS_INPUT_HANDLE_EVENT(getKeyCode, 1)
+	EventResult Input::onWindowKeyDown(const EventContext& ctx) {
+		_PTOS_INPUT_HANDLE_EVENT(1)
 	}
 
-	void Input::onWindowKeyUp(EventContext& ctx) {
-		_PTOS_INPUT_HANDLE_EVENT(getKeyCode, -1)
+	EventResult Input::onWindowKeyUp(const EventContext& ctx) {
+		_PTOS_INPUT_HANDLE_EVENT(-1)
 	}
 
-	void Input::onWindowMouseDown(EventContext& ctx) {
-		_PTOS_INPUT_HANDLE_EVENT(getMouseButton, 1)
+	EventResult Input::onWindowMouseDown(const EventContext& ctx) {
+		_PTOS_INPUT_HANDLE_EVENT(1)
 	}
 
-	void Input::onWindowMouseUp(EventContext& ctx) {
-		_PTOS_INPUT_HANDLE_EVENT(getMouseButton, -1)
+	EventResult Input::onWindowMouseUp(const EventContext& ctx) {
+		_PTOS_INPUT_HANDLE_EVENT(-1)
 	}
 
 	void Input::addEventListeners(EventLayer* layer) {
 		//NOTE: add any new Input event listeners to this array
 
-		void(*listeners[])(EventContext&) = { onWindowUpdate, onWindowKeyDown, onWindowKeyUp, onWindowMouseDown, onWindowMouseUp };
+		EventType listenerTypes[] = {EventTypes::WINDOW_UPDATE, EventTypes::WINDOW_KEY_DOWN, EventTypes::WINDOW_KEY_UP, EventTypes::WINDOW_MOUSE_DOWN, EventTypes::WINDOW_MOUSE_UP};
+		EventListenerFunc listeners[] = {onWindowUpdate, onWindowKeyDown, onWindowKeyUp, onWindowMouseDown, onWindowMouseUp};
 		size_t listener_count = sizeof(listeners) / sizeof(listeners[0]);
 
 		//do not add listeners if they have already been added
-		for (size_t i = 0; i < listener_count; i++)
-			if (layer->hasListener(listeners[i])) return;
-
-		layer->addListener(WINDOW_UPDATE, onWindowUpdate);
-		layer->addListener(WINDOW_KEY_DOWN, onWindowKeyDown);
-		layer->addListener(WINDOW_KEY_UP, onWindowKeyUp);
-		layer->addListener(WINDOW_MOUSE_DOWN, onWindowMouseDown);
-		layer->addListener(WINDOW_MOUSE_UP, onWindowMouseUp);
+		for (size_t i = 0; i < listener_count; i++) {
+			if (layer->hasListener(listenerTypes[i], listeners[i]))
+				return;
+		}
+		for (size_t i = 0; i < listener_count; i++) {
+			layer->addListener(listenerTypes[i], listeners[i]);
+		}
 	}
 }

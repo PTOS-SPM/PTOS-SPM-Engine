@@ -1,109 +1,110 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "predefines.h"
 
-#include "symbols/eventsystem.h"
-#include "symbols/window.h"
+#include "Input.h"
 
-#define PTOS_OVERRIDE_WINDOW_RENDERER_METHODS(name) \
-		name(EventLayer* eventLayer) : WindowRenderer(eventLayer) {} \
-		~name() { shutdown(); } \
-		void update() override; \
-		void init(const WindowProperties& props) override; \
-		void shutdown() override; \
-		void create() override; \
-		void destroy() override; \
-		void setVsync(bool vsync) override; \
-		void setWidth(int width) override; \
-		void setHeight(int height) override; \
-		void setSize(const WindowSize& size) override; \
-		void setTitle(const std::string& title) override; \
-		inline std::string getRendererName() override { return #name; } \
-		void* getImplWindow() override;
-
-//sets width=0, height=0, bytes=0
-#define PTOS_GLFW_ICON_EMPTY {0,0,0}
+#include <chrono>
+#include <string>
 
 namespace PTOS {
-
+	
 	const bool VSYNC_DEFAULT = true;
 
-
 	struct WindowSize {
-		WindowSize() { width = 0; height = 0; }
-		WindowSize(int width, int height) {
-			this->width = width;
-			this->height = height;
-		}
-
 		int width;
 		int height;
 	};
 
 	struct WindowProperties {
-		WindowProperties() {
-			this->size = WindowSize();
-			title = "";
-			icon = nullptr;
-		}
-
-		WindowProperties(WindowSize size, std::string& title, void* icon) {
-			this->size = size;
-			this->title = title;
-			this->icon = icon;
-		}
-
 		WindowSize size;
 		std::string title;
 		void* icon;
 	};
 
-	//abstract class for Window Renderers
+	struct WindowEvent {
+		WindowRenderer* windowRenderer;
+		Inputs::Code code = Inputs::CODE_NONE;
+		double dx = 0, dy = 0;
+	};
+
 	class WindowRenderer
 	{
 	public:
-		WindowRenderer(EventLayer* eventLayer);
+		WindowRenderer(EventSystem* esys, EventLayer* eventLayer);
 
-		//updates window
-		virtual void update() = 0;
-		//initializes renderer
+		//Gets the window renderer's target event layer
+		inline EventLayer* getEventLayer() const { return eventLayer; }
+		//Gets the window renderer event system
+		inline EventSystem* getEventSystem() const { return esys; }
+		//Gets the window renderer's initialization state
+		inline bool getInitialized() const { return isInitialized; }
+		//Gets the window renderer's shutdown state
+		inline bool getShutdown() const { return isShutdown; }
+		//Gets the window renderer's vsync setting
+		inline bool isVsync() const { return vsync; }
+		//Gets the window renderer's width
+		inline int getWidth() const { return size.width; }
+		//Gets the window renderer's heigth
+		inline int getHeight() const { return size.height; }
+		//Gets the window renderer's size
+		inline WindowSize getSize() const { return size; }
+		//Gets the window's title
+		inline std::string getTitle() const { return title; }
+		inline std::chrono::steady_clock::time_point getLastFrame() const { return lastFrame; }
+
+
+		//Initializes the window renderer
 		virtual void init(const WindowProperties& props) = 0;
-		//shuts down renderer
+		//Shuts down the window renderer
 		virtual void shutdown() = 0;
-		//creates a window using the renderer
+		//Creates a window using the window renderer
 		virtual void create() = 0;
-		//destorys a window using the renderer
+		//Destorys a window using the window renderer
 		virtual void destroy() = 0;
 
+		//Binds the rendering context to this window renderer
+		virtual void bind() = 0;
+		//Unbinds the rendering context from this window renderer
+		virtual void unbind() = 0;
+		//Called by Window::update after handling the frame renderer
+		virtual void onUpdate() = 0;
+
+		//Sets window vsync
 		virtual void setVsync(bool vsync) = 0;
+		//Sets window width
 		virtual void setWidth(int width) = 0;
+		//Sets window height
 		virtual void setHeight(int height) = 0;
+		//Sets window width and height
 		virtual void setSize(const WindowSize& size) = 0;
+		//Sets window title
 		virtual void setTitle(const std::string& title) = 0;
+		//Gets the window's creation status
 		virtual bool isCreated() = 0;
+		//Gets the renderer name
 		virtual std::string getRendererName() = 0;
+		//TODO docs
 		virtual void* getImplWindow() = 0;
 
-		inline EventLayer* getEventLayer() const { return eventLayer; }
-
-		inline bool getInitialized() const { return isInitialized; }
-		inline bool getShutdown() const { return isShutdown; }
-		inline bool isVsync() const { return vsync; }
-		inline int getWidth() const { return size.width; }
-		inline int getHeight() const { return size.height; }
-		inline WindowSize getSize() const { return size; }
-		inline std::string getTitle() { return title; }
-
 	protected:
+
+		//Window
+
 		bool isInitialized = false;
 		bool isShutdown = false;
 
-		EventLayer* eventLayer;
-		
+		EventSystem* esys = nullptr;
+		EventLayer* eventLayer = nullptr;
 
-		WindowSize size;
+		WindowSize size = {0,0};
 		std::string title = "";
-		bool vsync;
+		bool vsync = VSYNC_DEFAULT;
 
+		//Renderer
+
+		inline void setLastFrame() { lastFrame = std::chrono::high_resolution_clock::now(); }
+
+		std::chrono::steady_clock::time_point lastFrame = std::chrono::high_resolution_clock::now();
 	};
 }
