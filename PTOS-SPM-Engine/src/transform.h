@@ -6,13 +6,6 @@
 #include "matrix.h"
 
 namespace PTOS {
-	template<typename T> inline Matrix3<T> identity2() {
-		return Matrix3<T>({
-			{1, 0, 0},
-			{0, 1, 0},
-			{0, 0, 1}
-			});
-	}
 
 	template<typename T> inline Matrix3<T> translate2(T x, T y) {
 		return Matrix3<T>({
@@ -34,13 +27,13 @@ namespace PTOS {
 				{(T)cos(r), (T)sin(r), 0},
 				{(T)(-sin(r)), (T)(cos(r), 0},
 				{0, 0, 1}
-					});
+			});
 		else
-				return Matrix3<T>({
-					{(T)cos(r), (T)(-sin(r)), 0},
-					{(T)sin(r), (T)cos(r), 0},
-					{0, 0, 1}
-					}));
+			return Matrix3<T>({
+				{(T)cos(r), (T)(-sin(r)), 0},
+				{(T)sin(r), (T)cos(r), 0},
+				{0, 0, 1}
+			}));
 	}
 
 	template<typename T> inline Matrix3<T> scale2(T x, T y) {
@@ -53,15 +46,6 @@ namespace PTOS {
 
 	template<typename T> inline Matrix3<T> scale2(const Vector2<T>& v) {
 		return scale2<T>(v.x(), v.y());
-	}
-
-	template<typename T> inline Matrix4<T> identity3() {
-		return Matrix4<T>({
-			{1, 0, 0, 0},
-			{0, 1, 0, 0},
-			{0, 0, 1, 0},
-			{0, 0, 0, 1}
-			});
 	}
 
 	template<typename T> inline Matrix4<T> translate3(T x, T y, T z) {
