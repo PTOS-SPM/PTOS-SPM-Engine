@@ -59,7 +59,7 @@ namespace PTOS {
 	protected:
 		WindowRenderer* windowRenderer;
 		Renderer* renderer;
-		SceneInfo* scene;
+		SceneInfo* scene = nullptr;
 
 	private:
 		//stored as nanoseconds / frame

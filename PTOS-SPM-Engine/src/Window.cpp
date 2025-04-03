@@ -24,8 +24,7 @@ namespace PTOS {
 	}
 
 	bool Window::update() {
-		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - windowRenderer->getLastFrame());
-		if (duration.count() >= framerate) {
+		if (windowRenderer->getDeltaTime() >= framerate) {
 			windowRenderer->bind();
 			
 			renderer->setClearColor(rgbaHexToP(0x33, 0x33, 0x33)); //DEBUG color, set as some sort of attribute later
