@@ -2,12 +2,9 @@
 
 namespace PTOS {
 	SceneInfo::~SceneInfo() {
-	/*
-	//DEBUG
 		delete camera;
 		delete shader;
 		delete vertexArray;
-	*/
 	}
 
 	void Renderer::submit(SceneInfo* scene) {

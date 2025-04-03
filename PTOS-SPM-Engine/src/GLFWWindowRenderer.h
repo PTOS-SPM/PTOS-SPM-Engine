@@ -7,11 +7,7 @@
 #include "Input.h"
 #include "WindowRenderer.h"
 
-//DEBUG
-#include "Camera.h"
-#include "GLFWVertexArray.h"
-#include "GLFWBuffer.h"
-#include "GLFWShader.h"
+#include "GLFWWindowRenderer.h"
 
 #include <unordered_map>
 
@@ -43,13 +39,6 @@ namespace PTOS {
 			inline bool isCreated() override { return win != nullptr; }
 		inline GLFWimage* getIcon() { return &icon; }
 		void setIcon(GLFWimage& icon);
-
-		//DEBUG
-		GLFWVertexArray vertexArray;
-		GLFWVertexBuffer vertexBuffer;
-		GLFWIndexBuffer indexBuffer;
-		GLFWShader* shader = nullptr;
-		Camera2D camera;
 
 	private:
 		//Window
