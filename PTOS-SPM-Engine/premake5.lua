@@ -1,5 +1,5 @@
 project "PTOS-SPM-Engine"
-    location "PTOS-SPM-Engine"
+    location (cwd .. "/%{prj.name}")
     kind "StaticLib"
     staticruntime "on"
     
@@ -19,6 +19,7 @@ project "PTOS-SPM-Engine"
     {
         cwd .. "/%{prj.name}/src",
         cwd .. "/%{prj.name}/libs/spdlog/include",
+        cwd .. "/%{prj.name}/libs/glm",
         cwd .. "/%{IncludeDir.GLFW}",
         cwd .. "/%{IncludeDir.GLAD}"
     }
@@ -27,6 +28,14 @@ project "PTOS-SPM-Engine"
         "GLFW",
         "GLAD",
         "opengl32.lib"
+    }
+
+    configurations "vs*"
+        buildoptions { "/utf-8" } --fixes issue in fmt used by spdlog
+
+    vpaths {
+        ["headers"] = {"**.h", "**.hpp"},
+        ["src"] = {"**.cpp"}
     }
 
     filter "system:windows"

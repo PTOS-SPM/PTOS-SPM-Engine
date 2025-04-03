@@ -1,40 +1,37 @@
 #pragma once
 
-#include "Application.h"
-#include "ApplicationEvent.h"
-#include "EventSystem.h"
-#include "Input.h"
 #include "Log.h"
-#include "Window.h"
-#include "WindowEvent.h"
+#include "Application.h"
+#include "Input.h"
+#include "EventSystem.h"
 
-#include "Hooks.h"
 
-#include <iostream>
+PTOS::EventSystem* EVENTS = nullptr;
 
-extern PTOS_HOOK_CREATE_APPLICATION;
-extern PTOS_HOOK_START_APPLICATION;
-extern PTOS_HOOK_END_APPLICATION;
-extern PTOS_HOOK_PRE_UPDATE;
-extern PTOS_HOOK_POST_UPDATE;
+extern void PTOSInit(PTOS::Application* app);
 
-//make an event system and default layers
-PTOS::EventSystem* initEventSystem(PTOS::Application* application) {
-	PTOS::EventSystem* esys = new PTOS::EventSystem(application);
-	
-	PTOS::EventLayer* appLayer = new PTOS::EventLayer((PTOS::EventType*)PTOS::APP_EVENT_TYPES, PTOS::APP_EVENT_COUNT);
-	PTOS::EventLayer* winLayer = new PTOS::EventLayer((PTOS::EventType*)PTOS::WINDOW_EVENT_TYPES, PTOS::WINDOW_EVENT_COUNT);
-	PTOS::EventLayer* uiLayer = new PTOS::EventLayer();
+void initEventSystem(PTOS::Application* app) {
+	EVENTS = new PTOS::EventSystem(app);
 
-	//add input event listeners
+	PTOS::EventLayers::APPLICATION = new PTOS::EventLayer();
+	PTOS::EventLayers::WINDOW = new PTOS::EventLayer();
+	PTOS::EventLayers::UI = new PTOS::EventLayer();
 
-	PTOS::Input::addEventListeners(winLayer);
+	PTOS_CORE_INFO("Layer APPLICATION\t{0}", (void*)PTOS::EventLayers::APPLICATION);
+	PTOS_CORE_INFO("Layer WINDOW\t{0}", (void*)PTOS::EventLayers::WINDOW);
+	PTOS_CORE_INFO("Layer UI\t{0}", (void*)PTOS::EventLayers::UI);
 
-	esys->addLayer(appLayer);
-	esys->addLayer(winLayer);
-	esys->addLayer(uiLayer);
+	PTOS::Input::addEventListeners(PTOS::EventLayers::WINDOW);
 
-	return esys;
+	EVENTS->addLayer(PTOS::EventLayers::APPLICATION, PTOS::EventLayers::PRIORITY_APPLICATION);
+	EVENTS->addLayer(PTOS::EventLayers::WINDOW, PTOS::EventLayers::PRIORITY_WINDOW);
+	EVENTS->addLayer(PTOS::EventLayers::UI, PTOS::EventLayers::PRIORITY_UI);
+
+#ifdef PTOS_LOGGING
+	PTOS::EventLayers::APPLICATION->addListener(PTOS::EventTypes::APP_START, [](const PTOS::EventContext& ctx) { PTOS_CORE_INFO("Started Application"); return PTOS::EventResult{}; });
+	PTOS::EventLayers::APPLICATION->addListener(PTOS::EventTypes::APP_END, [](const PTOS::EventContext& ctx) { PTOS_CORE_INFO("Ended Application"); return PTOS::EventResult{}; });
+#endif
+
 }
 
 int main(int argc, char** argv) {
@@ -42,32 +39,38 @@ int main(int argc, char** argv) {
 	PTOS::Log::init();
 
 	PTOS_CORE_TRACE("Creating Application");
-	PTOS::Application* app = PTOS::PTOS_HOOKNAME_CREATE_APPLICATION();
+	PTOS::Application* app = new PTOS::Application();
 	PTOS_CORE_INFO("Created Application");
 
-	PTOS::EventSystem* esys = initEventSystem(app);
+	initEventSystem(app);
 
-	PTOS::ApplicationContextManager appCtxM(PTOS::ApplicationContext{app, esys});
+	PTOSInit(app);
+
+	EVENTS->addEvent(PTOS::EventLayers::APPLICATION, { PTOS::EventTypes::APP_START, PTOS_EVENTDATA PTOS::ApplicationEvent{ app }});
 
 	PTOS_CORE_TRACE("Starting Application");
-	PTOS::PTOS_HOOKNAME_START_APPLICATION(appCtxM);
-	PTOS_CORE_INFO("Started Application");
+	EVENTS->handle();
 
 	while (app->doRun()) {
-		PTOS::PTOS_HOOKNAME_PRE_UPDATE(appCtxM);
+		EVENTS->addEvent(PTOS::EventLayers::APPLICATION, { PTOS::EventTypes::APP_UPDATE, PTOS_EVENTDATA PTOS::ApplicationEvent{ app } });
 
 		//handle events
-		esys->handle();
+		EVENTS->handle(); //NOTE: while windows only update at their given framerate, the Event System is still being handled every iteration
 
 		//handle windows
-		app->windows.handle();
+		app->handle();
 
-		PTOS::PTOS_HOOKNAME_POST_UPDATE(appCtxM);
+		//handle events again
+		EVENTS->handle();
 	}
 
+	EVENTS->handle();
+
 	PTOS_CORE_TRACE("Ending Application");
-	PTOS::PTOS_HOOKNAME_END_APPLICATION(app);
-	PTOS_CORE_INFO("Ended Application");
+	EVENTS->addEvent(PTOS::EventLayers::APPLICATION, { PTOS::EventTypes::APP_END, PTOS_EVENTDATA PTOS::ApplicationEvent{app} });
+	EVENTS->handle();
+
+	delete app;
 
 	return 0;
 }

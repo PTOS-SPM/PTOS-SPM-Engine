@@ -7,3 +7,6 @@
 [submodule "PTOS-SPM-Engine/libs/glad"]
 	path = PTOS-SPM-Engine/libs/glad
 	url = https://github.com/PTOS-SPM/glad.git
+[submodule "PTOS-SPM-Engine/libs/glm"]
+	path = PTOS-SPM-Engine/libs/glm
+	url = https://github.com/PTOS-SPM/glm

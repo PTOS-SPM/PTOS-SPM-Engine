@@ -1,32 +1,30 @@
 #pragma once
 
-//forward declarations
+//Predefines
 
-#include "symbols/application.h"
-#include "symbols/eventsystem.h"
-#include "symbols/input.h"
-#include "symbols/window.h"
+#include "predefines.h"
 
 //Normal Includes
 
 #include "Application.h"
-#include "ApplicationEvent.h"
-#include "Event.h"
-#include "EventLayer.h"
+#include "Buffer.h"
+#include "Camera.h"
 #include "EventSystem.h"
+#include "GLFWBuffer.h"
+#include "GLFWRenderer.h"
+#include "GLFWShader.h"
+#include "GLFWVertexArray.h"
+#include "GLFWWindowRenderer.h"
 #include "Input.h"
 #include "Log.h"
-#include "transform.h"
-#include "vector.h"
+#include "ptosmath.h"
+#include "Renderer.h"
+#include "Shader.h"
+#include "VertexArray.h"
 #include "Window.h"
-#include "WindowEvent.h"
 #include "WindowRenderer.h"
 
-//Renderers
+//Entry Point
 
-#include "GLFWRenderer.h"
-
-//For entrypoint
-
-#include "Hooks.h"
+#include "Core.h"
 #include "Start.h"

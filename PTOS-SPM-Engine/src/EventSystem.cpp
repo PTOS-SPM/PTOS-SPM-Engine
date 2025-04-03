@@ -1,191 +1,277 @@
 #include "EventSystem.h"
-#include "EventLayer.h"
-#include "Event.h"
 #include "Log.h"
 
-#include <ostream>
-
 namespace PTOS {
+#ifdef PTOS_LOGGING
+	namespace EventTypes {
+		PTOS_API std::unordered_map<EventType, std::string> EVENT_TYPE_NAMES{
+			{APP_START, "APP_START"},
+			{APP_UPDATE, "APP_UPDATE"},
+			{APP_END, "APP_END"},
+			{WINDOW_OPEN, "WINDOW_OPEN"},
+			{WINDOW_CLOSE, "WINDOW_CLOSE"},
+			{WINDOW_MOVE, "WINDOW_MOVE"},
+			{WINDOW_RESIZE, "WINDOW_RESIZE"},
+			{WINDOW_UPDATE, "WINDOW_UPDATE"},
+			{WINDOW_KEY_DOWN, "WINDOW_KEY_DOWN"},
+			{WINDOW_KEY_UP, "WINDOW_KEY_UP"},
+			{WINDOW_MOUSE_DOWN, "WINDOW_MOUSE_DOWN"},
+			{WINDOW_MOUSE_UP, "WINDOW_MOUSE_UP"},
+			{WINDOW_MOUSE_SCROLL, "WINDOW_MOUSE_SCROLL"},
+			{WINDOW_MOUSE_MOVE, "WINDOW_MOUSE_MOVE"}
+		};
+	}
+#endif
 
-    EventSystem::EventSystem(Application* app) {
-        this->app = app;
-        layers = std::vector<EventLayer*>();
-    }
+	EventLayer::~EventLayer() {
+		for (auto it = listeners.begin(); it != listeners.end(); it++) {
+			EventListenerNode* node = it->second, *next;
+			while (node != nullptr) {
+				next = node->next;
+				delete node;
+				node = next;
+			}
+		}
+		listeners.clear();
+	}
 
-    EventSystem::~EventSystem() {
-        for (EventLayer* layer : layers)
-            delete layer;
-        if (types) {
-            EventTypeLL* iter = types;
-            EventTypeLL* todel = types;
-            while (iter != nullptr) {
-                iter = todel->next;
-                delete todel;
-                todel = iter;
-            }
-        }
-        layers.clear();
-    }
+	bool EventLayer::addListener(EventType type, const EventListener& listener) {
+		if (listeners.find(type) == listeners.end()) {
+			EventListenerNode* node = new EventListenerNode;
+			node->listener = listener;
+			listeners[type] = node;
+		}
+		else {
+			EventListenerNode* node = listeners[type];
+			//node should never be nullptr, let any errors happen if it is
+			if (node->listener.handler == listener.handler) {
+				node->listener = listener;
+				return false;
+			}
+			while (node->next != nullptr) {
+				node = node->next;
+				if (node->listener.handler == listener.handler) {
+					node->listener = listener;
+					return false;
+				}
+			}
+			node->next = new EventListenerNode;
+			node->next->listener = listener;
+		}
+		return true;
+	}
 
-    bool EventSystem::addLayer(EventLayer* layer) {
-        for (size_t i = 0; i < layer->getTypeCount(); i++)
-            if (hasType(layer->getTypes()[i])) {
-                //PTOS_CORE_ERR("EventType collision on layer {0}: {1}", *layer, layer->getTypes()[i]); //TODO: (C2338) static_assert failed: 'Cannot format an argument. To make type T formattable provide a formatter<T> specialization: https://fmt.dev/latest/api.html#udt
-                return false;
-            }
-        for (size_t i = 0; i < layer->getTypeCount(); i++)
-            addType(layer->getTypes()[i]);
-        layers.push_back(layer);
-        return true;
-    }
+	void EventLayer::addListener(EventType type, EventListenerFunc listener) {
+		EventListener listenerData;
+		listenerData.handler = listener;
+		addListener(type, listenerData);
+	}
 
-    bool EventSystem::insertLayer(EventLayer* layer, double priority) {
-        priority = priority < 1 ? priority : 1;
-        if (priority == 1)
-            return addLayer(layer); //just append
-        else {
-            for (size_t i = 0; i < layer->getTypeCount(); i++)
-                if (hasType(layer->getTypes()[i])) {
-                    //PTOS_CORE_ERR("EventType collision on layer {0}: {1}", *layer, layer->getTypes()[i]);
-                    return false;
-                }
-            size_t index = (size_t)(layers.size() * priority);
-            layers.insert(layers.begin() + index, layer);
-        }
-        return true;
-    }
+	bool EventLayer::removeListener(EventType type, EventListenerFunc listener) {
+		if (listeners.find(type) == listeners.end())
+			return false;
+		EventListenerNode* node = listeners[type];
+		//node should never be nullptr, let any errors happen if it is
+		if (node->next == nullptr && node->listener.handler == listener) {
+			delete node;
+			listeners.erase(type);
+			return true;
+		}
+		while (node->next != nullptr) {
+			if (node->next->listener.handler == listener) {
+				EventListenerNode* pop = node->next;
+				node->next = pop->next;
+				delete pop;
+				return true;
+			}
+		}
+		return false;
+	}
 
-    bool EventSystem::removeLayer(EventLayer* layer) {
-        for (auto lyr = layersBegin(); lyr != layersEnd(); lyr++) {
-            if (*lyr == layer) {
-                for (size_t i = 0; i < layer->getTypeCount(); i++)
-                    removeType(layer->getTypes()[i]);
-                layers.erase(lyr);
-                return true;
-            }
-        }
-        return false;
-    }
+	bool EventLayer::hasListener(EventType type, EventListenerFunc listener) {
+		if (listeners.find(type) == listeners.end())
+			return false;
+		EventListenerNode* node = listeners[type];
+		while (node != nullptr) {
+			if (node->listener.handler == listener)
+				return true;
+			node = node->next;
+		}
+		return false;
+	}
 
-    bool EventSystem::removeLayer(size_t index) {
-        if (index >= layers.size()) return false;
-        EventLayer* layer = layers.at(index);
-        for (size_t i = 0; i < layer->getTypeCount(); i++)
-            removeType(layer->getTypes()[i]);
-        layers.erase(layersBegin() + index);
-        return true;
-    }
+	EventResult EventLayer::handle(const EventContext& ctx, bool isBubble, bool isCapture) {
+		EventType type = ctx.event.type;
+		if (listeners.find(type) == listeners.end())
+			return EventResult{};
 
-    std::vector<EventLayer*>::const_iterator EventSystem::findLayer(EventLayer* layer) {
-        for (auto lyr = layersBegin(); lyr != layersEnd(); lyr++)
-            if (*lyr == layer) return lyr;
-        return layersEnd();
-    }
+		EventResult finalResult{};
 
-    bool EventSystem::addType(EventType type) {
-        if (types == nullptr) {
-            types = new EventTypeLL{ type, nullptr };
-            return true;
-        }
+		EventListenerNode* node = listeners[type];
+		while (node != nullptr) {
+			if ((isBubble && node->listener.bubble) || (isCapture && node->listener.capture)) {
+				EventResult res = node->listener.handler(ctx);
+				finalResult.cancelBubble |= res.cancelBubble;
+				finalResult.cancelCapture |= res.cancelCapture;
+				finalResult.cancelLayer |= res.cancelLayer;
 
-        EventTypeLL* iter = types;
-        EventTypeLL* prev;
-        while (iter != nullptr) {
-            if (iter->type == type) return false;
-            else if (iter->type > type) {
-                EventTypeLL* next = iter->next;
-                iter->next = new EventTypeLL{ type, next };
-                return true;
-            }
-            else {
-                prev = iter;
-                iter = iter->next;
-            }
-        }
-        //add to end
-        prev->next = new EventTypeLL{ type, nullptr };
-        return true;
-    }
+				if (finalResult.cancelLayer)
+					return finalResult;
+			}
+			node = node->next;
+		}
 
-    void EventSystem::removeType(EventType type) {
-        if (types == nullptr) return;
-        else if (types->type == type) {
-            delete types;
-            types = nullptr;
-            return;
-        }
-        else if (types->next == nullptr) return;
+		return finalResult;
+	}
 
-        EventTypeLL* iter = types->next;
-        EventTypeLL* prev = types;
-        while (iter != nullptr) {
-            if (iter->type == type) {
-                delete iter;
-                prev->next = nullptr;
-                return;
-            }
-            else if (iter->type > type) return;
-            else {
-                prev = iter;
-                iter = iter->next;
-            }
-        }
-    }
+	EventSystem::EventSystem(Application* app) {
+		this->app = app;
+		layers = layersTail = nullptr;
+		eventQueue = eventQueueTail = nullptr;
+	}
 
-    bool EventSystem::hasType(EventType type) {
-        EventTypeLL* iter = types;
-        while (iter != nullptr) {
-            if (iter->type == type)
-                return true;
-            else if (iter->type > type)
-                return false;
-            else iter = iter->next;
-        }
-        return false;
-    }
+	EventSystem::~EventSystem() {
+		while (layers != nullptr) {
+			layersTail = layers->next; //use layers tail as container for next
+			delete layers;
+			layers = layersTail;
+		}
+		clearEventQueue();
+	}
 
-    void EventSystem::handle() {
-        std::vector<Event*> propagate;
-        std::vector<Event*> propagateNext;
-        for (auto lyr = layersBegin(); lyr != layersEnd(); lyr++) {
-            EventLayer* layer = *lyr;
+	void EventSystem::addLayer(EventLayer* layer, double priority) {
+		if (layers == nullptr) {
+			layers = layersTail = new EventLayerNode{layer, priority};
+		}
+		else if (priority > layersTail->priority) {
+			layersTail = new EventLayerNode{layer, priority, layersTail};
+			layersTail->prev->next = layersTail;
+		}
+		else if (priority < layers->priority) {
+			layers = new EventLayerNode{layer, priority, nullptr, layers};
+			layers->next->prev = layers;
+		}
+		else {
+			EventLayerNode* node = layers->next;
+			while (node != nullptr) {
+				if (priority < node->priority) {
+					node->prev->next = new EventLayerNode{layer, priority, node->prev, node};
+					break;
+				}
+				node = node->next;
+			}
+		}
+	}
+	
+	bool EventSystem::removeLayer(EventLayer* layer) {
+		if (layers == nullptr)
+			return false;
+		else if (layer == layers->layer) {
+			EventLayerNode* node = layers;
+			layers = layers->next;
+			if (layers != nullptr)
+				layers->prev = nullptr;
+			delete node;
+			return true;
+		}
+		else if (layer == layersTail->layer) {
+			EventLayerNode* node = layersTail;
+			layersTail = layers->prev;
+			if (layersTail != nullptr)
+				layersTail->next = nullptr;
+			delete node;
+			return true;
+		}
+		else {
+			EventLayerNode* node = layers->next;
+			while (node != nullptr) {
+				if (node->layer == layer) {
+					node->prev->next = node->next;
+					delete node;
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 
-            //copy queue and clear original, allow for current events to dispatch events which will be handled on next call to EventSystem::handle
+	void EventSystem::addEvent(const EventLayer* layer, const Event& event) {
+		PTOS_ASSERT(layer != nullptr, "layer cannot be nullptr");
+#ifdef PTOS_LOGGING
+		if (layer != EventLayers::APPLICATION) {
+			if (EventTypes::EVENT_TYPE_NAMES.find(event.type) == EventTypes::EVENT_TYPE_NAMES.end())
+				PTOS_CORE_TRACE("New Event [{0}@{1}]", event.type, (void*)layer);
+			else
+				PTOS_CORE_TRACE("New Event [{0}@{1}]", EventTypes::EVENT_TYPE_NAMES[event.type], (void*)layer);
+		}
+#endif
+		if (eventQueueTail == nullptr) {
+			eventQueueTail = eventQueue = new EventQueueNode{{event, layer, this}};
+		}
+		else {
+			eventQueueTail->next = new EventQueueNode{{event, layer, this}};
+			eventQueueTail = eventQueueTail->next;
+		}
+	}
 
-            std::vector<Event*> copyQueue;
-            copyQueue.insert(copyQueue.end(), layer->queueBegin(), layer->queueEnd());
-            layer->clearQueue();
+	void EventSystem::handle() {
+		EventQueueNode* queued = eventQueue, *next;
+		//clear the queue so that other events can be built up and not interfere with this call to EventSystem::handle
+		eventQueue = eventQueueTail = nullptr;
 
-            for (Event* event : copyQueue)
-                handleEvent(event, layer, propagateNext);
-            copyQueue.clear();
+		while (queued != nullptr) {
+			EventLayerNode* layerNode = layers;
+			bool nbubble = false, ncapture = false;
+			while (layerNode != nullptr) {
+				if (layerNode->layer == queued->ctx.layer)
+					break;
+				layerNode = layerNode->next;
+			}
+			if (layerNode != nullptr) {
+				while (layerNode != nullptr) {
+					EventResult result = layerNode->layer->handle(queued->ctx, true, false);
+					nbubble |= result.cancelBubble;
+					ncapture |= result.cancelCapture;
+					if (result.cancelLayer)
+						break;
+					layerNode = layerNode->next;
+				}
+				if (!ncapture) {
+					if (layerNode == nullptr)
+						layerNode = layersTail;
+					while (layerNode != nullptr) {
+						EventResult result = layerNode->layer->handle(queued->ctx, false, true);
+						ncapture |= result.cancelCapture;
+						if (ncapture)
+							break;
+						layerNode = layerNode->prev;
+					}
+				}
+			}
+			if (queued->ctx.event.data != nullptr) {
+				delete queued->ctx.event.data;
+			}
+			next = queued->next;
+			delete queued;
+			queued = next;
+		}
+	}
 
-            for (Event* event : propagate)
-                handleEvent(event, layer, propagateNext);
+	void EventSystem::clearEventQueue() {
+		while (eventQueue != nullptr) {
+			if (eventQueue->ctx.event.data != nullptr) {
+				delete eventQueue->ctx.event.data;
+			}
+			eventQueueTail = eventQueue->next; //use event queue tail as container for next
+			delete eventQueue;
+			eventQueue = eventQueueTail;
+		}
+		eventQueue = eventQueueTail = nullptr;
+	}
 
-            //reset current and next
-            propagate = propagateNext;
-            propagateNext.clear();
-        }
-        //clear remaining events
-        for (auto evt : propagate)
-            delete evt;
-        propagate.clear();
-    }
-
-    void EventSystem::handleEvent(Event* event, EventLayer* layer, std::vector<Event*>& pg) {
-        EventType type = event->getType();
-        auto end = layer->getListenerEnd(type);
-        for (auto lst = layer->getListenerBegin(type); lst != end && event->shouldHandle(); lst++) {
-            (*lst)(EventContext{layer, *lst, event, app});
-        }
-        if (event->shouldPropagate())
-            pg.push_back(event);
-        else
-            delete event;
-    }
-}
-
-std::ostream& operator<< (std::ostream& os, PTOS::EventSystem& eventSystem) {
-    return os << "<EventSystem at " << &eventSystem << ">";
+	namespace EventLayers {
+		PTOS_API EventLayer* APPLICATION;
+		PTOS_API EventLayer* WINDOW;
+		PTOS_API EventLayer* UI;
+	}
 }

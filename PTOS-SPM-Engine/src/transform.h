@@ -1,309 +1,114 @@
 #pragma once
 
+#include "predefines.h"
+
 #include "vector.h"
+#include "matrix.h"
 
 namespace PTOS {
+	template<typename T> inline Matrix3<T> identity2() {
+		return Matrix3<T>({
+			{1, 0, 0},
+			{0, 1, 0},
+			{0, 0, 1}
+			});
+	}
 
-    template<typename T=PTOS_VECTOR_DEFAULT_TYPE>
-    struct Transform3 {
-        T values[4][4];
-        inline T& w() { return values[3][3]; }
-    };
+	template<typename T> inline Matrix3<T> translate2(T x, T y) {
+		return Matrix3<T>({
+			{1, 0, x},
+			{0, 1, y},
+			{0, 0, 1}
+			});
+	}
 
-    template<typename T=PTOS_VECTOR_DEFAULT_TYPE>
-    struct Transform2 {
-        T values[3][3];
-        inline T& w() { return values[2][2]; }
-    };
+	template<typename T> inline Matrix3<T> translate2(const Vector2<T>& v) {
+		return translate2<T>(v.x(), v.y());
+	}
 
-    //vector3 translation generators
+	template<typename T> Matrix3<T> rotate2(double r) {
+		if (r == 0)
+			return identity2<T>();
+		else if (r > 0)
+			return Matrix3<T>({
+				{(T)cos(r), (T)sin(r), 0},
+				{(T)(-sin(r)), (T)(cos(r), 0},
+				{0, 0, 1}
+					});
+		else
+				return Matrix3<T>({
+					{(T)cos(r), (T)(-sin(r)), 0},
+					{(T)sin(r), (T)cos(r), 0},
+					{0, 0, 1}
+					}));
+	}
 
-    template<typename T>
-    Transform3<T> translate3(T x, T y, T z) {
-        return Transform3<T>{{
-            {1, 0, 0, x},
-            { 0, 1, 0, y },
-            { 0, 0, 1, z },
-            { 0, 0, 0, PTOS_VECTOR_UND }
-        }};
-    }
+	template<typename T> inline Matrix3<T> scale2(T x, T y) {
+		return Matrix3<T>({
+			{x, 0, 0},
+			{0, y, 0},
+			{0, 0, 1}
+			});
+	}
 
-    template<typename T>
-    Transform3<T> scale3(T x, T y, T z) {
-        return Transform3<T>{{
-            {x, 0, 0, 0},
-            {0, y, 0, 0},
-            {0, 0, z, 0},
-            {0, 0, 0, PTOS_VECTOR_UND}
-        }};
-    }
+	template<typename T> inline Matrix3<T> scale2(const Vector2<T>& v) {
+		return scale2<T>(v.x(), v.y());
+	}
 
-    template<typename T>
-    Transform3<T> rotateX3(T r) {
-        return Transform3<T>{{
-            {1, 0, 0, 0},
-            {0, cos(r), -sin(r), 0},
-            {0, sin(r), cos(r), 0},
-            {0, 0, 0, PTOS_VECTOR_UND}
-        }};
-    }
+	template<typename T> inline Matrix4<T> identity3() {
+		return Matrix4<T>({
+			{1, 0, 0, 0},
+			{0, 1, 0, 0},
+			{0, 0, 1, 0},
+			{0, 0, 0, 1}
+			});
+	}
 
-    template<typename T>
-    Transform3<T> rotateY3(T r) {
-        return Transform3<T>{{
-            {cos(r), 0, sin(r), 0},
-            {0, 1, 0, 0},
-            {-sin(r), 0, cos(0), 0},
-            {0, 0, 0, PTOS_VECTOR_UND}
-        }};
-    }
+	template<typename T> inline Matrix4<T> translate3(T x, T y, T z) {
+		return Matrix4<T>({
+			{1, 0, 0, x},
+			{0, 1, 0, y},
+			{0, 0, 1, z},
+			{0, 0, 0, 1}
+			});
+	}
 
-    template<typename T>
-    Transform3<T> rotateZ3(T r) {
-        return Transform3<T>{{
-            {cos(r), -sin(r), 0, 0},
-            {sin(r), cos(r), 0, 0},
-            {0, 0, 1, 0},
-            {0, 0, 0, PTOS_VECTOR_UND}
-        }};
-    }
+	template<typename T> inline Matrix4<T> translate3(const Vector3<T>& v) {
+		return translate3<T>(v.x(), v.y(), v.z());
+	}
 
-    //3d operators
+	template<typename T> inline Matrix4<T> rotate3(const Euler<T>& r) {
+		return Matrix4<T>({
+			{cos(r.z()) * cos(r.y()), cos(r.z()) * sin(r.y()) * sin(r.x()) - sin(r.z()) * cos(r.x()), cos(r.z()) * sin(r.y()) * cos(r.x()) + sin(r.z()) * sin(r.x()), 0},
+			{sin(r.z()) * cos(r.y()), sin(r.z()) * sin(r.y()) * sin(r.x()) + cos(r.z()) * cos(r.x()), sin(r.z()) * sin(r.y()) * cos(r.x()) - cos(r.z()) * sin(r.x()), 0},
+			{-sin(r.y()), cos(r.y()) * sin(r.x()), cos(r.y()) * cos(r.x()), 0},
+			{0, 0, 0, 1}
+			});
+	}
 
-    //transform */+- transform = transform
+	template<typename T> inline Matrix4<T> scale3(T x, T y, T z) {
+		return Matrix4<T>({
+			{x, 0, 0, 0},
+			{0, y, 0, 0},
+			{0, 0, z, 0},
+			{0, 0, 0, 1}
+			});
+	}
 
-    template<typename T> Transform3<T> operator+ (Transform3<T>& t1, Transform3<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] += t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform3<T>{rtv};
-    }
+	template<typename T> inline Matrix4<T> scale3(const Vector3<T> v) {
+		return scale3<T>(v.x(), v.y(), v.z());
+	}
 
-    template<typename T> Transform3<T> operator- (Transform3<T>& t1, Transform3<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] -= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform3<T>{rtv};
-    }
+	template<typename T> inline Matrix4<T> projectionMatrix(T left, T right, T bottom, T top, T near, T far) {
+		return Matrix4<T>({
+			{(T)2.0 / (right - left), 0, 0, -(right + left) / (right - left)},
+			{0, (T)2.0 / (top - bottom), 0, -(top + bottom) / (top - bottom)},
+			{0, 0, -2 / (far - near), -(far + near) / (far - near)},
+			{0, 0, 0, 1}
+			});
+	}
 
-    template<typename T> Transform3<T> operator* (Transform3<T>& t1, Transform3<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] *= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform3<T>{rtv};
-    }
-
-    template<typename T> Transform3<T> operator/ (Transform3<T>& t1, Transform3<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] /= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform3<T>{rtv};
-    }
-
-
-    //transform */+- T = transform
-
-    template<typename T> Transform3<T> operator* (Transform3<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] *= val;
-
-        return Transform3<T>{rtv};
-    }
-
-    template<typename T> Transform3<T> operator/ (Transform3<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] /= val;
-
-        return Transform3<T>{rtv};
-    }
-
-    template<typename T> Transform3<T> operator+ (Transform3<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] += val;
-
-        return Transform3<T>{rtv};
-    }
-
-    template<typename T> Transform3<T> operator- (Transform3<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] -= val;
-
-        return Transform3<T>{rtv};
-    }
-
-    template<typename T> Transform3<T> operator* (T& val, Transform3<T>& t1) { return t1 * val; }
-    template<typename T> Transform3<T> operator/ (T& val, Transform3<T>& t1) { return t1 * (1 / val); }
-    template<typename T> Transform3<T> operator+ (T& val, Transform3<T>& t1) { return t1 + val; }
-    template<typename T> Transform3<T> operator- (T& val, Transform3<T>& t1) { return (t1 - val) * -1; }
-
-    //transfotm * vector = vector
-
-    template<typename T> Vector3<T> operator* (Transform3<T>& t, Vector3<T>& v) {
-        Vector3<T> rtv = Vector3<T>::zero();
-        t.w() = v.w();
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                rtv.values[i] = t.values[i][j] * v.values[i];
-        return rtv;
-    }
-
-    template<typename T> Vector3<T> operator* (Vector3<T>& v, Transform3<T>& t) { return t * v; }
-
-    //vector2 translation generators
-
-    template<typename T>
-    Transform2<T> translate2(T x, T y) {
-        return Transform2<T>{{
-            {1, 0, x},
-            {0, 1, y},
-            {0, 0, PTOS_VECTOR_UND}
-        }};
-    }
-
-    template<typename T>
-    Transform2<T> scale2(T x, T y) {
-        return Transform2<T>{{
-            {x, 0, 0},
-            {0, y, 0},
-            {0, 0, PTOS_VECTOR_UND}
-        }};
-    }
-
-    template<typename T>
-    Transform2<T> rotate2(T r) {
-        return Transform2<T>{{
-            {cos(r), -sin(r), 0},
-            {sin(r), cos(r), 0},
-            {0, 0, PTOS_VECTOR_UND}
-        }};
-    }
-
-    //2d operators
-
-    //transform */+- transform = transform
-
-    template<typename T> Transform2<T> operator+ (Transform2<T>& t1, Transform2<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] += t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator- (Transform2<T>& t1, Transform2<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] -= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator* (Transform2<T>& t1, Transform2<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] *= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator/ (Transform2<T>& t1, Transform2<T>& t2) {
-        T rtv[4][4] = t1.values;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] /= t2.values[i][j];
-        if (t1.w() == PTOS_VECTOR_UND && t2.w() != PTOS_VECTOR_UND)
-            rtv[3][3] = t2.w();
-        return Transform2<T>{rtv};
-    }
-
-
-    //transform */+- T = transform
-
-    template<typename T> Transform2<T> operator* (Transform2<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] *= val;
-
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator/ (Transform2<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] /= val;
-
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator+ (Transform2<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] += val;
-
-        return Transform2<T>{rtv};
-    }
-
-    template<typename T> Transform2<T> operator- (Transform2<T>& t1, T& val) {
-        T rtv[4][4] = t1.values;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++)
-                rtv[i][j] -= val;
-
-        return Transform2<T>{rtv};
-    }
-    
-    template<typename T> Transform2<T> operator* (T& val, Transform2<T>& t1) { return t1 * val; }
-    template<typename T> Transform2<T> operator/ (T& val, Transform2<T>& t1) { return t1 * (1 / val); }
-    template<typename T> Transform2<T> operator+ (T& val, Transform2<T>& t1) { return t1 + val; }
-    template<typename T> Transform2<T> operator- (T& val, Transform2<T>& t1) { return (t1 - val) * -1; }
-
-    //transfotm * vector = vector
-
-    template<typename T> Vector2<T> operator* (Transform2<T>& t, Vector2<T>& v) {
-        Vector2<T> rtv = Vector2<T>::zero();
-        t.w() = v.w();
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                rtv.values[i] = t.values[i][j] * v.values[i];
-        return rtv;
-    }
-
-    template<typename T> Vector2<T> operator* (Vector2<T>& v, Transform2<T>& t) { return t * v; }
+	template<typename T> inline Matrix4<T> projectionMatrix(T left, T right, T bottom, T top) {
+		return projectionMatrix<T>(left, right, bottom, top, (T)(-1), (T)(1));
+	}
 }

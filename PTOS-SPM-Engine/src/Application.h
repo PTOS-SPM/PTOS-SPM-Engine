@@ -1,82 +1,52 @@
 #pragma once
 
-#include <vector>
-
-#include "symbols/application.h"
+#include "predefines.h"
 #include "EventSystem.h"
-#include "Hooks.h"
-#include "Window.h"
+
+#include <string>
+#include <vector>
 
 namespace PTOS {
 
-	class ApplicationWindows {
+	class Application {
 	public:
+		Application() {};
+		~Application();
 
-		ApplicationWindows();
-		~ApplicationWindows();
+		//Get run status of application
+		inline bool doRun() const { return run; };
+		//Tells the application to stop running
+		inline void stop() { run = false; };
+		//Gets window at the given index
+		inline Window* getWindow(size_t i) { return windows[i]; }
 
-		inline size_t size() const { return windows.size(); }
-		inline Window* get(size_t index) { return windows.at(index); }
-		inline void clear() { return windows.clear(); }
-		inline std::vector<Window*>::const_iterator begin() const { return windows.begin(); }
-		inline std::vector<Window*>::const_iterator end() const { return windows.end(); }
-		inline bool has(Window* window) { return find(window) != end(); }
-
-		std::vector<Window*>::const_iterator find(Window* window);
-		bool add(Window* window);
-		bool remove(size_t index);
-		bool remove(Window* window);
-
+		//Checks if window is owned by this application
+		bool hasWindow(Window* window);
+		//Adds a window to the application
+		//Returns true if window is not already present
+		bool addWindow(Window* window);
+		//Removes the window at the given index from the application
+		//Returns true if index is present
+		bool removeWindow(size_t index);
+		//Removes the given window from the application
+		//Returns true if window is present
+		bool removeWindow(Window* window);
+		//Removes the window with the given window renderer from the application
+		//Returns true if a window with the given window renderer was present
+		bool removeWindow(WindowRenderer* windowRenderer);
+		//Create a new window with the given renderers and properties
+		Window* newWindow(int width, int height, const std::string title, void* icon, WindowRenderer* windowRenderer, Renderer* renderer);
+		//Create a new window with the given renderers and structured properties
+		Window* newWindow(const WindowProperties& props, WindowRenderer* windowRenderer, Renderer* renderer);
+		//Handle windows
 		void handle();
 
-	private:
-		std::vector<Window*> windows;
-	};
-
-	class Application
-	{
-	public:
-		Application();
-		~Application();
-		ApplicationWindows windows;
-
-		inline bool doRun() const { return run; }
-		void stop();
-
 	protected:
+		std::vector<Window*> windows;
 		bool run = true;
 	};
 
-	//define context related data
-
-	struct ApplicationContext {
-		Application* app = nullptr;
-		EventSystem* eventSystem = nullptr;
+	struct ApplicationEvent {
+		Application* app;
 	};
-
-	class ApplicationContextManager {
-	public:
-		ApplicationContextManager(ApplicationContext& ctx) { this->ctx = ctx; }
-
-		inline Application* getApplication() { return ctx.app; }
-
-		Window* newWindow(int width, int heigt, std::string& title, void* icon, WindowRenderer* (*rendererCallback)(EventLayer*));
-		EventLayer* newLayer(EventType* types, size_t typeCount);
-		EventLayer* newLayer() { return newLayer(nullptr, 0); };
-
-	private:
-		ApplicationContext ctx;
-	};
-
-
-	//define hook-in events
-
-#pragma warning(push)
-#pragma warning(disable:4003)
-	_PTOS_HOOKDEF_CREATE_APPLICATION();
-	_PTOS_HOOKDEF_START_APPLICATION();
-	_PTOS_HOOKDEF_END_APPLICATION();
-	_PTOS_HOOKDEF_PRE_UPDATE();
-	_PTOS_HOOKDEF_POST_UPDATE();
-#pragma warning(pop)
 }

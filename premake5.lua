@@ -11,6 +11,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "PTOS-SPM-Engine/libs/glfw/include"
 IncludeDir["GLAD"] = "PTOS-SPM-Engine/libs/glad/include"
+IncludeDir["glm"] = "PTOS-SPM-Engine/libs/glm"
 
 include "PTOS-SPM-Engine/libs/glfw"
 include "PTOS-SPM-Engine/libs/glad"
@@ -36,6 +37,7 @@ project "TestEngine"
     includedirs
     {
         "PTOS-SPM-Engine/libs/spdlog/include",
+        "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}",
         "PTOS-SPM-Engine/src"
@@ -44,6 +46,9 @@ project "TestEngine"
     links {
         "PTOS-SPM-Engine"
     }
+
+    configurations "vs*"
+        buildoptions { "/utf-8" } --fixes issue in fmt used by spdlog
 
     filter "system:windows"
         systemversion "latest"
