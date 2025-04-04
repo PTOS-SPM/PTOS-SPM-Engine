@@ -21,15 +21,16 @@ void main()
 }
 )";
 
-std::string greenPixelSrc = R"(
+std::string colorPixelSrc = R"(
 
 #version 330 core
 
 layout(location = 0) out vec4 color;
+uniform vec3 _color;
 
 void main()
 {
-	color = vec4(0, 1.0, 0, 1.0);
+	color = vec4(_color, 1.0);
 }
 )";
 
@@ -122,10 +123,11 @@ void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 	triangle.vertexArray->setIndexBuffer(&triangleIndexBuffer);
 
 	std::string triangleSrc[] = { vertexSrc, pixelSrc };
-	std::string squareSrc[] = { vertexSrc, greenPixelSrc };
+	std::string squareSrc[] = { vertexSrc, colorPixelSrc };
 	int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
 
 	square.shader = PTOS::GLFWShader::compile(squareSrc, types, sizeof(squareSrc) / sizeof(squareSrc[0]));
+
 	triangle.shader = PTOS::GLFWShader::compile(triangleSrc, types, sizeof(triangleSrc) / sizeof(triangleSrc[0]));
 	square.transform = new PTOS::ComponentTransform();
 	triangle.transform = new PTOS::ComponentTransform();
@@ -206,6 +208,9 @@ PTOS::EventResult onWindowUpdate(const PTOS::EventContext& ctx) {
 		scene.camera->setRotation(0);
 		triangle.transform->setPosition(PTOS::vec3(0, 0, 0));
 	}
+
+	square.shader->bind();
+	square.shader->upload("_color", PTOS::vec3(0, 1.0f, 0));
 
 	for (auto& pair : input.getAnyAll()) {
 		PTOS_DEBUG("{0}: {1}", (int)pair.first, pair.second.count);
