@@ -29,8 +29,9 @@ namespace PTOS {
 	template<typename T> PTOS_API struct Matrix2;
 	template<typename T> PTOS_API struct Matrix3;
 	template<typename T> PTOS_API struct Matrix4;
+	class PTOS_API ComponentTransform;
 
-#ifdef PTOS_GL_MATH
+#ifdef PTOS_GLM_MATH
 	typedef glm::dvec2 dvec2;
 	typedef glm::vec2 vec2;
 	typedef glm::dvec3 dvec3;
@@ -91,6 +92,8 @@ namespace PTOS {
 	class PTOS_API VertexArray;
 	class PTOS_API VertexBuffer;
 	class PTOS_API IndexBuffer;
+	class PTOS_API SceneInfo;
+	struct PTOS_API SceneItem;
 
 	//Events
 
