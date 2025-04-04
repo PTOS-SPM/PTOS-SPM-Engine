@@ -8,7 +8,7 @@
 
 #ifdef PTOS_GLM_MATH
 #include "glm/glm.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #endif
 
 namespace PTOS {
@@ -49,6 +49,9 @@ namespace PTOS {
 
 	template<typename T> inline Matrix4<T> rotate(const Matrix4<T>& m, T angle, const Vector3<T>& axis) {
 		return m * rotate3(axis * angle);
+	}
+	template<typename T> inline Matrix4<T> rotate(const Matrix4<T>& m, const Vector3<T>& angles) {
+		return m * rotate3(angles);
 	}
 
 	template<typename T> inline Matrix3<T> scale(const Matrix3<T>& m, const Vector2<T>& v) {
