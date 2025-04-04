@@ -5,6 +5,7 @@
 
 #define PTOS_ZERO_DIVIDE(n, d) (d == 0 ? 0 : (n/d))
 
+#ifdef PTOS_GLM_MATH
 #include "glm/glm.hpp"
 //GL_FALSE
 #define PTOS_GL_TRANSPOSE 0
