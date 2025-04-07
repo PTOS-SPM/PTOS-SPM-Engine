@@ -101,7 +101,7 @@ namespace PTOS {
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //make macos happy
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-			gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+			needsGladInit = true;
 			PTOS_CORE_TRACE("Initialized GLWF");
 			glfwSetErrorCallback(glfwErrorCallback);
 		}
@@ -129,6 +129,10 @@ namespace PTOS {
 		win = glfwCreateWindow(size.width, size.height, title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(win);
 		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		if (needsGladInit) {
+			PTOS_CORE_VERIFY(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to load GL functions");
+			needsGladInit = false;
+		}
 		glfwSetWindowUserPointer(win, this);
 		setVsync(this->vsync);
 		if (icon.width > 0 && icon.height > 0)

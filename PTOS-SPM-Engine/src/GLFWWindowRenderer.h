@@ -56,6 +56,8 @@ namespace PTOS {
 		GLFWwindow* win = nullptr;
 		float deltaTime = 0;
 		float lastTime = 0;
+
+		bool needsGladInit = false;
 	};
 
 	const std::unordered_map<int, Inputs::Code> codeMapGLFW = {
