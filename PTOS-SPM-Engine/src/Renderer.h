@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "ComponentTransform.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "VertexArray.h"
 
 #include <vector>
@@ -49,10 +50,10 @@ namespace PTOS {
 	};
 
 	struct SceneItem {
-		~SceneItem();
 		Shader* shader = nullptr;
 		VertexArray* vertexArray = nullptr;
 		ComponentTransform* transform = nullptr;
+		Texture* texture = nullptr;
 	};
 
 	class Renderer {

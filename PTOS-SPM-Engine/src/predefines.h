@@ -94,6 +94,8 @@ namespace PTOS {
 	class PTOS_API IndexBuffer;
 	class PTOS_API SceneInfo;
 	struct PTOS_API SceneItem;
+	class PTOS_API Texture;
+	class PTOS_API Texture2D;
 
 	//Events
 
@@ -121,6 +123,8 @@ namespace PTOS {
 	struct PTOS_API WindowProperties;
 	class PTOS_API WindowRenderer;
 
+#if defined(PTOS_RENDER_GL) || defined(PTOS_RENDER_DYNAMIC)
+
 	//GLFW Overrides
 
 	class PTOS_API GLFWIndexBuffer;
@@ -129,4 +133,8 @@ namespace PTOS {
 	class PTOS_API GLFWVertexBuffer;
 
 	class PTOS_API GLFWWindowRenderer;
+
+	class PTOS_API GLFWTexture2D;
+
+#endif
 }

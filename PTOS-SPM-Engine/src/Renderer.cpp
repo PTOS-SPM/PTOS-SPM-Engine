@@ -53,6 +53,10 @@ namespace PTOS {
 			item->transform->calcMatrix();
 			item->shader->upload("transform", item->transform->getMatrix());
 		}
+		if (item->texture != nullptr) {
+			item->texture->bind();
+			item->shader->upload("sampler", 0);
+		}
 		drawIndexed(item->vertexArray);
 		scene->overrideVPCache = false;
 	}
@@ -68,6 +72,9 @@ namespace PTOS {
 			if (item->transform != nullptr) {
 				item->transform->calcMatrix();
 				item->shader->upload("transform", item->transform->getMatrix());
+			}
+			if (item->texture != nullptr) {
+				item->texture->bind();
 			}
 			drawIndexed(item->vertexArray);
 		}
