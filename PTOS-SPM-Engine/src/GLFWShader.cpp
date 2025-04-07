@@ -280,7 +280,7 @@ namespace PTOS {
 	void GLFWShader::del() {
 		glDeleteProgram(id);
 		delete[] loadedSrc;
-		delete loadedTypes;
+		delete[] loadedTypes;
 		id = 0;
 		loadedSrc = nullptr;
 		loadedTypes = nullptr;
