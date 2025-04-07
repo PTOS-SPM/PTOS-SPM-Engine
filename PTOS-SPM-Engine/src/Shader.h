@@ -9,6 +9,11 @@ namespace PTOS {
 
 	class Shader {
 	public:
+		static Shader* create(const std::string& filename);
+		static Shader* create(const std::string& vertexShaderSrc, const std::string& pixelShaderSrc);
+
+		virtual Shader* copy() = 0;
+
 		virtual void bind() = 0;
 		virtual void unbind() = 0;
 

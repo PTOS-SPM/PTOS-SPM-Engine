@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <fstream>
 #include <vector>
 
 #include "GLFWShader.h"
@@ -11,6 +12,93 @@ namespace PTOS {
 	GLFWShader* GLFWShader::compile(std::string* src, int* types, size_t count) {
 		GLFWShader* shader = new GLFWShader();
 		PTOS_CORE_VERIFY(shader->loadSource(src, types, count), "GLFW Shader Load Error");
+		return shader;
+	}
+
+	//make sure to free srcOut and typesOut
+	size_t GLFWShader::readFromFile(const std::string& path, std::string** srcOut, int** typesOut) {
+		std::ifstream inFile(path, std::ios::in, std::ios::binary);
+		PTOS_ASSERT(inFile, "Failed to open file");
+		std::string contents;
+
+		inFile.seekg(0, std::ios::end);
+		contents.resize(inFile.tellg());
+		inFile.seekg(0, std::ios::beg);
+		inFile.read(&contents[0], contents.size());
+
+		inFile.close();
+
+		std::vector<size_t> positions;
+		const char* typeToken = "#type";
+		size_t typeTokenLength = std::strlen(typeToken);
+
+		size_t currentPos = 0;
+		do {
+			currentPos = contents.find(typeToken, currentPos);
+			if (currentPos == std::string::npos)
+				break;
+			size_t afterToken = currentPos + typeTokenLength;
+			if (!(contents[afterToken] == ' ' || contents[afterToken] == '\t')) {
+				currentPos = contents.find_first_of("\r\n", currentPos);
+				if (currentPos == std::string::npos)
+					break;
+				currentPos++;
+				continue;
+			}
+			size_t eol = contents.find_first_of("\r\n", currentPos);
+			PTOS_CORE_ASSERT(eol != std::string::npos, "Syntax Error: EOF");
+
+			positions.push_back(afterToken+1);
+			positions.push_back(eol);
+			currentPos = eol + 1;
+
+		} while (currentPos != std::string::npos);
+
+		size_t count = positions.size() / 2;
+		if (count == 0)
+			return 0;
+		std::string* srcs = new std::string[count];
+		int* types = new int[count];
+
+		for (auto it = positions.begin(); it != positions.end(); it += 2) {
+			size_t beginType = *it, eol = *(it+1);
+			bool isEnd = (it + 2) >= positions.end();
+
+			std::string typeName = contents.substr(beginType, eol - beginType);
+			typeName.erase(typeName.begin(), std::find_if(typeName.begin(), typeName.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+			typeName.erase(std::find_if(typeName.rbegin(), typeName.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), typeName.end());
+			PTOS_CORE_ASSERT(typeName.size() != 0, "Syntax Error: missing shader type name");
+			std::transform(typeName.begin(), typeName.end(), typeName.begin(), ::tolower);
+
+			int type;
+			if (typeName == "vertex")
+				type = GL_VERTEX_SHADER;
+			else if (typeName == "fragment" || typeName == "pixel")
+				type = GL_FRAGMENT_SHADER;
+			else
+				PTOS_CORE_ASSERT(false, "Shader Type Error: invalid GL shader type");
+
+			std::string src;
+			if (isEnd)
+				src = contents.substr(eol + 1);
+			else
+				src = contents.substr(eol + 1, *(it + 2) - eol - 2 - (typeTokenLength));
+
+			size_t index = (it - positions.begin()) / 2;
+			srcs[index] = src;
+			types[index] = type;
+		}
+
+		*srcOut = srcs;
+		*typesOut = types;
+
+		return count;
+	}
+
+	Shader* GLFWShader::copy() {
+		GLFWShader* shader = new GLFWShader();
+		if (loadedCount)
+			shader->loadSource(loadedSrc, loadedTypes, loadedCount);
 		return shader;
 	}
 
@@ -175,11 +263,27 @@ namespace PTOS {
 			id = 0;
 			return false;
 		}
-		else return true;
+		
+		loadedSrc = new std::string[count];
+		loadedTypes = new int[count];
+
+		for (size_t i = 0; i < count; i++)
+			loadedSrc[i] = src[i];
+		std::memcpy(loadedTypes, types, sizeof(types[0]) * count);
+		loadedCount = count;
+
+		
+		return true;
 	}
 
 
 	void GLFWShader::del() {
 		glDeleteProgram(id);
+		delete[] loadedSrc;
+		delete loadedTypes;
+		id = 0;
+		loadedSrc = nullptr;
+		loadedTypes = nullptr;
+		loadedCount = 0;
 	}
 }

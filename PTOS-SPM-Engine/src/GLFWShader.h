@@ -7,8 +7,12 @@ namespace PTOS {
 	class GLFWShader : public Shader {
 	public:
 		static GLFWShader* compile(std::string* src, int* types, size_t count);
+		static size_t readFromFile(const std::string& path, std::string** srcOut, int** typesOut);
 
 		~GLFWShader() { unbind(); del(); }
+
+		Shader* copy() override;
+
 		void bind() override;
 		void unbind() override;
 
@@ -33,6 +37,9 @@ namespace PTOS {
 		bool loadSource(std::string* src, int* types, size_t count) override;
 		void del() override;
 	private:
+		std::string* loadedSrc = nullptr;
+		int* loadedTypes = nullptr;
+		size_t loadedCount = 0;
 		uint32_t id = 0;
 	};
 }
