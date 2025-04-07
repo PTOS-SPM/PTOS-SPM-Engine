@@ -22,14 +22,69 @@ namespace PTOS {
 		glUseProgram(0); //shader program id of 0 means bind to no program
 	}
 
-	void GLFWShader::upload(const std::string& name, const dmat4& matrix) {
+	void GLFWShader::upload(const std::string& name, int v) {
 		GLint location = glGetUniformLocation(id, name.c_str());
-		glUniformMatrix4dv(location, 1, PTOS_GL_TRANSPOSE, (GLdouble*)&matrix[0][0]);
+		glUniform1i(location, v);
+	}
+
+	void GLFWShader::upload(const std::string& name, float v) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform1f(location, v);
+	}
+
+	void GLFWShader::upload(const std::string& name, double v) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform1d(location, v);
+	}
+
+	void GLFWShader::upload(const std::string& name, const mat3& matrix) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniformMatrix3fv(location, 1, PTOS_GL_TRANSPOSE, (GLfloat*)&matrix[0][0]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const dmat3& matrix) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniformMatrix3dv(location, 1, PTOS_GL_TRANSPOSE, (GLdouble*)&matrix[0][0]);
 	}
 
 	void GLFWShader::upload(const std::string& name, const mat4& matrix) {
 		GLint location = glGetUniformLocation(id, name.c_str());
 		glUniformMatrix4fv(location, 1, PTOS_GL_TRANSPOSE, (GLfloat*)&matrix[0][0]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const dmat4& matrix) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniformMatrix4dv(location, 1, PTOS_GL_TRANSPOSE, (GLdouble*)&matrix[0][0]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const vec2& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform2f(location, vec[0], vec[1]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const dvec2& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform2d(location, vec[0], vec[1]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const vec3& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform3f(location, vec[0], vec[1], vec[2]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const dvec3& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform3d(location, vec[0], vec[1], vec[2]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const vec4& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform4f(location, vec[0], vec[1], vec[2], vec[3]);
+	}
+
+	void GLFWShader::upload(const std::string& name, const dvec4& vec) {
+		GLint location = glGetUniformLocation(id, name.c_str());
+		glUniform4d(location, vec[0], vec[1], vec[2], vec[3]);
 	}
 
 	//cite: https://www.khronos.org/opengl/wiki/Shader_Compilation

@@ -1,17 +1,79 @@
 #include "Renderer.h"
 
 namespace PTOS {
+
+	SceneInfo::SceneInfo() {
+		camera = new Camera2D();
+	}
+	SceneInfo::SceneInfo(Camera2D* camera) {
+		this->camera = camera;
+	}
 	SceneInfo::~SceneInfo() {
-		delete camera;
-		delete shader;
-		delete vertexArray;
+		if (camera != nullptr)
+			delete camera;
+	}
+
+	void SceneInfo::addSceneItem(SceneItem* item) {
+		items.push_back(item);
+		overrideVPCache = true;
+	}
+
+	void SceneInfo::removeSceneItem(size_t index) {
+		SceneItem* item = items[index];
+		items.erase(items.begin() + index);
+		overrideVPCache = true;
+	}
+
+	void SceneInfo::removeSceneItem(SceneItem* item) {
+		bool modified = false;
+		for (auto it = items.begin(); it != items.end();) {
+			if (*it == item) {
+				items.erase(it);
+				modified = true;
+			}
+			else it++;
+		}
+
+		if (modified)
+			overrideVPCache = true;
+	}
+
+	SceneItem::~SceneItem() {
+		if (shader != nullptr)
+			delete shader;
+		if (vertexArray != nullptr)
+			delete vertexArray;
+		if (transform != nullptr)
+			delete transform;
+	}
+
+	void Renderer::submit(SceneInfo* scene, SceneItem* item) {
+		if (scene->camera->recalc() || scene->overrideVPCache) {
+			item->shader->bind();
+			item->shader->upload("viewProjection", scene->camera->getVP());
+		}
+		if (item->transform != nullptr) {
+			item->transform->calcMatrix();
+			item->shader->upload("transform", item->transform->getMatrix());
+		}
+		drawIndexed(item->vertexArray);
+		scene->overrideVPCache = false;
 	}
 
 	void Renderer::submit(SceneInfo* scene) {
-		if (scene->camera->recalc()) {
-			scene->shader->bind();
-			scene->shader->upload("viewProjection", scene->camera->getVP());
+		bool updatedVP = scene->camera->recalc() || scene->overrideVPCache;
+		const mat4& vp = scene->camera->getVP();
+		for (auto it = scene->getItems().begin(); it != scene->getItems().end(); it++) {
+			SceneItem* item = *it;
+			item->shader->bind();
+			if (updatedVP)
+				item->shader->upload("viewProjection", vp);
+			if (item->transform != nullptr) {
+				item->transform->calcMatrix();
+				item->shader->upload("transform", item->transform->getMatrix());
+			}
+			drawIndexed(item->vertexArray);
 		}
-		drawIndexed(scene->vertexArray);
+		scene->overrideVPCache = false;
 	}
 }

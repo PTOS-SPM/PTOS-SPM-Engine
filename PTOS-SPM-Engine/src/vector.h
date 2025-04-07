@@ -17,15 +17,15 @@ namespace PTOS {
 		static inline Vector2<T> left() { return Vector2<T>(-1.0, 0.0); }
 		static inline Vector2<T> one() { return Vector2<T>(1.0, 1.0); }
 
-		static inline T angle(Vector2<T>& lv, Vector2<T>& rv) {
+		static inline T angle(const Vector2<T>& lv, const Vector2<T>& rv) {
 			return atan2(rv[1] * lv[0] - rv[0] * lv[1], rv[0] * lv[0] + rv[1] * lv[1]);
 		}
 
-		static inline T distance(Vector2<T>& lv, Vector2<T>& rv) {
+		static inline T distance(const Vector2<T>& lv, const Vector2<T>& rv) {
 			return sqrt((lv[1] - rv[1]) * (lv[1] - rv[1]) + (lv[0] - rv[0]) * (lv[0] - rv[0]));
 		}
 
-		static inline T dot(Vector2<T>& lv, Vector2<T>& rv) {
+		static inline T dot(const Vector2<T>& lv, const Vector2<T>& rv) {
 			return lv[0] * rv[0] + lv[1] * rv[1];
 		}
 
@@ -46,11 +46,11 @@ namespace PTOS {
 
 		//conversions
 
-		Vector2(Vector3<T>& v) {
+		Vector2(const Vector3<T>& v) {
 			std::memcpy(&data, &v.data, sizeof(T) * 2);
 		}
 
-		Vector2(Vector4<T>& v) {
+		Vector2(const Vector4<T>& v) {
 			std::memcpy(&data, &v.data, sizeof(T) * 2);
 		}
 
@@ -61,58 +61,61 @@ namespace PTOS {
 		inline const T& x() const { return data[0]; }
 		inline const T& y() const { return data[1]; }
 
-		inline operator T* () { return (T*)data; }
+		inline operator T* () const { return (T*)data; }
 
 		inline T operator [] (int index) const {
 			return data[index];
 		}
+		inline T& operator [] (int index) {
+			return data[index];
+		}
 
-		inline Vector2<T> operator * (T m) {
+		inline Vector2<T> operator * (T m) const {
 			return Vector2<T>(data[0] * m, data[1] * m);
 		}
 
-		inline Vector2<T> operator / (T m) {
+		inline Vector2<T> operator / (T m) const {
 			return Vector2<T>(PTOS_ZERO_DIVIDE(data[0], m), PTOS_ZERO_DIVIDE(data[1], m));
 		}
 
-		inline Vector2<T> operator + (T m) {
+		inline Vector2<T> operator + (T m) const {
 			return Vector2<T>(data[0] + m, data[1] + m);
 		}
 
-		inline Vector2<T> operator - (T m) {
+		inline Vector2<T> operator - (T m) const {
 			return Vector2<T>(data[0] - m, data[1] - m);
 		}
 
-		inline Vector2<T> operator * (Vector2<T>& v) {
+		inline Vector2<T> operator * (const Vector2<T>& v) const {
 			return Vector2<T>(data[0] * v[0], data[1] * v[1]);
 		}
 
-		inline Vector2<T> operator / (Vector2<T>& v) {
+		inline Vector2<T> operator / (const Vector2<T>& v) const {
 			return Vector2<T>(PTOS_ZERO_DIVIDE(data[0], v[0]), PTOS_ZERO_DIVIDE(data[1], v[1]));
 		}
 
-		inline Vector2<T> operator + (Vector2<T>& v) {
+		inline Vector2<T> operator + (const Vector2<T>& v) const {
 			return Vector2<T>(data[0] + v[0], data[1] + v[1]);
 		}
 
-		inline Vector2<T> operator - (Vector2<T>& v) {
+		inline Vector2<T> operator - (const Vector2<T>& v) const {
 			return Vector2<T>(data[0] - v[0], data[1] - v[1]);
 		}
 
-		inline bool operator == (Vector2<T> v) {
+		inline bool operator == (const Vector2<T>& v) const {
 			return data[0] == v[0] && data[1] == v[1];
 		}
 
-		inline T magnitude() {
+		inline T magnitude() const {
 			return sqrt(data[0] * data[0] + data[1] * data[1]);
 		}
 
-		Vector2<T> normalize() {
+		Vector2<T> normalize() const {
 			T mag = magnitude();
 			return mag == 0 ? Vector2<T>() : *this / mag;
 		}
 
-		inline Vector2<T> perpendicular() {
+		inline Vector2<T> perpendicular() const {
 			return Vector2<T>(-data[1], data[0]);
 		}
 
@@ -127,19 +130,19 @@ namespace PTOS {
 		static inline Vector3<T> back() { return Vector3<T>(0.0, 0.0, -1.0); }
 		static inline Vector3<T> one() { return Vector3<T>(1.0, 1.0, 1.0); }
 
-		static inline T angle(Vector3<T>& lv, Vector3<T>& rv) {
+		static inline T angle(const Vector3<T>& lv, const Vector3<T>& rv) {
 			return acos(dot(lv, rv) / (lv.magnitude() * rv.magnitude()));
 		}
 
-		static inline Vector3<T> cross(Vector3<T>& lv, Vector3<T>& rv) {
+		static inline Vector3<T> cross(const Vector3<T>& lv, const Vector3<T>& rv) {
 			return Vector3<T>(lv[1] * rv[2] - lv[2] * rv[1], lv[2] * rv[0] - lv[0] * rv[2], lv[0] * rv[1] - lv[1] * rv[0]);
 		}
 
-		static inline T distance(Vector3<T>& lv, Vector3<T>& rv) {
+		static inline T distance(const Vector3<T>& lv, const Vector3<T>& rv) {
 			return sqrt((lv[0] - rv[0]) * (lv[0] - rv[0]) + (lv[1] - rv[1]) * (lv[1] - rv[1]) + (lv[2] - rv[2]) * (lv[2] - rv[2]));
 		}
 
-		static inline T dot(Vector3<T>& lv, Vector3<T>& rv) {
+		static inline T dot(const Vector3<T>& lv, const Vector3<T>& rv) {
 			return lv[0] * rv[0] + lv[1] * rv[1] + lv[2] * rv[2];
 		}
 
@@ -161,14 +164,14 @@ namespace PTOS {
 
 		//conversions
 
-		Vector3(Vector2<T>& v, T z) {
+		Vector3(const Vector2<T>& v, T z) {
 			std::memcpy(&data, &v.data, sizeof(T) * 2);
 			data[2] = z;
 		}
 
-		Vector3(Vector2<T>& v) : Vector3(v, 0) {}
+		Vector3(const Vector2<T>& v) : Vector3(v, 0) {}
 
-		Vector3(Vector4<T>& v) {
+		Vector3(const Vector4<T>& v) {
 			std::memcpy(&data, &v.data, sizeof(T) * 3);
 		}
 
@@ -190,9 +193,12 @@ namespace PTOS {
 		inline const T& g() const { return data[1]; }
 		inline const T& b() const { return data[2]; }
 
-		inline operator T* () { return (T*)data; }
+		inline operator T* () const { return (T*)data; }
 
 		inline T operator [] (int index) const {
+			return data[index];
+		}
+		inline T& operator [] (int index) {
 			return data[index];
 		}
 
@@ -212,31 +218,31 @@ namespace PTOS {
 			return Vector3<T>(data[0] - m, data[1] - m, data[2] - m);
 		}
 
-		inline Vector3<T> operator * (Vector3<T>& v) const {
+		inline Vector3<T> operator * (const Vector3<T>& v) const {
 			return Vector3<T>(data[0] * v[0], data[1] * v[1], data[2] * v[2]);
 		}
 
-		inline Vector3<T> operator / (Vector3<T>& v) const {
+		inline Vector3<T> operator / (const Vector3<T>& v) const {
 			return Vector3<T>(PTOS_ZERO_DIVIDE(data[0], v[0]), PTOS_ZERO_DIVIDE(data[1], v[1]), PTOS_ZERO_DIVIDE(data[2], v[2]));
 		}
 
-		inline Vector3<T> operator + (Vector3<T>& v) const {
+		inline Vector3<T> operator + (const Vector3<T>& v) const {
 			return Vector3<T>(data[0] + v[0], data[1] + v[1], data[2] + v[2]);
 		}
 
-		inline Vector3<T> operator - (Vector3<T>& v) const {
+		inline Vector3<T> operator - (const Vector3<T>& v) const {
 			return Vector3<T>(data[0] - v[0], data[1] - v[1], data[2] - v[2]);
 		}
 
-		inline bool operator == (Vector3<T> v) const {
+		inline bool operator == (const Vector3<T> v) const {
 			return data[0] == v[0] && data[1] == v[1] && data[2] == v[2];
 		}
 
-		inline T magnitude() {
+		inline T magnitude() const {
 			return sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2]);
 		}
 
-		Vector3<T> normalize() {
+		Vector3<T> normalize() const {
 			T mag = magnitude();
 			return mag == 0 ? Vector3<T>() : *this / mag;
 		}
@@ -252,15 +258,15 @@ namespace PTOS {
 		static inline Vector4<T> back() { return Vector4<T>(0.0, 0.0, -1.0, 0.0); }
 		static inline Vector4<T> one() { return Vector4<T>(1.0, 1.0, 1.0, 1.0); }
 
-		static inline T angle(Vector4<T>& lv, Vector4<T>& rv) {
+		static inline T angle(const Vector4<T>& lv, const Vector4<T>& rv) {
 			return acos(dot(lv, rv) / (lv.magnitude() * rv.magnitude()));
 		}
 
-		static inline T distance(Vector4<T>& lv, Vector4<T>& rv) {
+		static inline T distance(const Vector4<T>& lv, const Vector4<T>& rv) {
 			return sqrt((lv[0] - rv[0]) * (lv[0] - rv[0]) + (lv[1] - rv[1]) * (lv[1] - rv[1]) + (lv[2] - rv[2]) * (lv[2] - rv[2]) + (lv[3] - rv[3]) * (lv[3] - rv[3]));
 		}
 
-		static inline T dot(Vector4<T>& lv, Vector4<T>& rv) {
+		static inline T dot(const Vector4<T>& lv, const Vector4<T>& rv) {
 			return lv[0] * rv[0] + lv[1] * rv[1] + lv[2] * rv[2] + lv[3] * rv[3];
 		}
 
@@ -283,21 +289,21 @@ namespace PTOS {
 
 		//conversions
 
-		Vector4(Vector2<T>& v, T z, T w) {
+		Vector4(const Vector2<T>& v, T z, T w) {
 			std::memcpy(&data, &v.data, sizeof(T) * 2);
 			data[2] = z;
 			data[3] = w;
 		}
 
-		Vector4(Vector2<T>& v, T z) : Vector4(v, z, 0) {}
-		Vector4(Vector2<T>& v) : Vector4(v, 0, 0) {}
+		Vector4(const Vector2<T>& v, T z) : Vector4(v, z, 0) {}
+		Vector4(const Vector2<T>& v) : Vector4(v, 0, 0) {}
 
-		Vector4(Vector3<T>& v, T w) {
+		Vector4(const Vector3<T>& v, T w) {
 			std::memcpy(&data, &v.data, sizeof(T) * 3);
 			data[3] = w;
 		}
 
-		Vector4(Vector3<T>& v) : Vector4(v, 0) {}
+		Vector4(const Vector3<T>& v) : Vector4(v, 0) {}
 
 		T data[4]{ 0, 0, 0, 0 };
 
@@ -319,53 +325,56 @@ namespace PTOS {
 		inline const T& b() const { return data[2]; }
 		inline const T& a() const { return data[3]; }
 
-		inline operator T* () { return (T*)data; }
+		inline operator T* () const { return (T*)data; }
 
 		inline T operator [] (int index) const {
 			return data[index];
 		}
+		inline T& operator [] (int index) {
+			return data[index];
+		}
 
-		inline Vector4<T> operator * (T m) {
+		inline Vector4<T> operator * (T m) const {
 			return Vector4<T>(data[0] * m, data[1] * m, data[2] * m, data[3] * m);
 		}
 
-		inline Vector4<T> operator / (T m) {
+		inline Vector4<T> operator / (T m) const {
 			return Vector4<T>(PTOS_ZERO_DIVIDE(data[0], m), PTOS_ZERO_DIVIDE(data[1], m), PTOS_ZERO_DIVIDE(data[2], m), PTOS_ZERO_DIVIDE(data[3], m));
 		}
 
-		inline Vector4<T> operator + (T m) {
+		inline Vector4<T> operator + (T m) const {
 			return Vector4<T>(data[0] + m, data[1] + m, data[2] + m, data[3] + m);
 		}
 
-		inline Vector4<T> operator - (T m) {
+		inline Vector4<T> operator - (T m) const {
 			return Vector4<T>(data[0] - m, data[1] - m, data[2] - m, data[3] - m);
 		}
 
-		inline Vector4<T> operator * (Vector4<T>& v) {
+		inline Vector4<T> operator * (const Vector4<T>& v) const {
 			return Vector4<T>(data[0] * v[0], data[1] * v[1], data[2] * v[2], data[3] * v[3]);
 		}
 
-		inline Vector4<T> operator / (Vector4<T>& v) {
+		inline Vector4<T> operator / (const Vector4<T>& v) const {
 			return Vector4<T>(PTOS_ZERO_DIVIDE(data[0], v[0]), PTOS_ZERO_DIVIDE(data[1], v[1]), PTOS_ZERO_DIVIDE(data[2], v[2]), PTOS_ZERO_DIVIDE(data[3], v[3]));
 		}
 
-		inline Vector4<T> operator + (Vector4<T>& v) {
+		inline Vector4<T> operator + (const Vector4<T>& v) const {
 			return Vector4<T>(data[0] + v[0], data[1] + v[1], data[2] + v[2], data[3] + v[3]);
 		}
 
-		inline Vector4<T> operator - (Vector4<T>& v) {
+		inline Vector4<T> operator - (const Vector4<T>& v) const {
 			return Vector4<T>(data[0] - v[0], data[1] - v[1], data[2] - v[2], data[3] - v[3]);
 		}
 
-		inline bool operator == (Vector4<T> v) {
+		inline bool operator == (const Vector4<T> v) const {
 			return data[0] == v[0] && data[1] == v[1] && data[2] == v[2] && data[3] == v[3];
 		}
 
-		inline T magnitude() {
+		inline T magnitude() const {
 			return sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2] + data[3] * data[3]);
 		}
 
-		Vector4<T> normalize() {
+		Vector4<T> normalize() const {
 			T mag = magnitude();
 			return mag == 0 ? Vector4<T>() : *this / mag;
 		}

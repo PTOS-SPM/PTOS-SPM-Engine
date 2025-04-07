@@ -1,6 +1,8 @@
 #pragma once
 
 #include "predefines.h"
+#include "vector.h"
+#include "matrix.h"
 
 #define DV(a, b) PTOS_ZERO_DIVIDE(a, b)
 #define VEC(n) Vector##n##<T>
@@ -15,16 +17,16 @@
 #define OPINP(RT, OPE, OP, ARG1T, ARG1, ARG2T, ARG2) RT operator OPE (ARG1T ARG1, ARG2T ARG2) { return (ARG1 = ARG1 OP ARG2); }
 //operator define
 #define OPRDEF(NAME,N)\
-	PREFIX OPRV(NAME(N),*,const NAME(N)&,v,const T,m)\
-	PREFIX OPRV(NAME(N),+,const NAME(N)&,v,const T,m)\
-	PREFIX OPINP(NAME(N),*=,*,const NAME(N)&,v,const T,m)\
-	PREFIX OPINP(NAME(N),/=,/,const NAME(N)&,v,const T,m)\
-	PREFIX OPINP(NAME(N),+=,+,const NAME(N)&,v,const T,m)\
-	PREFIX OPINP(NAME(N),-=,-,const NAME(N)&,v,const T,m)\
-	PREFIX OPINP(NAME(N),*=,*,const NAME(N)&,v,NAME(N)&,v2)\
-	PREFIX OPINP(NAME(N),/=,/,const NAME(N)&,v,NAME(N)&,v2)\
-	PREFIX OPINP(NAME(N),+=,+,const NAME(N)&,v,NAME(N)&,v2)\
-	PREFIX OPINP(NAME(N),-=,-,const NAME(N)&,v,NAME(N)&,v2)\
+	PREFIX OPRV(NAME(N),*,const NAME(N)&,v,T,m)\
+	PREFIX OPRV(NAME(N),+,const NAME(N)&,v,T,m)\
+	PREFIX OPINP(NAME(N),*=,*,NAME(N)&,v,T,m)\
+	PREFIX OPINP(NAME(N),/=,/,NAME(N)&,v,T,m)\
+	PREFIX OPINP(NAME(N),+=,+,NAME(N)&,v,T,m)\
+	PREFIX OPINP(NAME(N),-=,-,NAME(N)&,v,T,m)\
+	PREFIX OPINP(NAME(N),*=,*,NAME(N)&,v,const NAME(N)&,v2)\
+	PREFIX OPINP(NAME(N),/=,/,NAME(N)&,v,const NAME(N)&,v2)\
+	PREFIX OPINP(NAME(N),+=,+,NAME(N)&,v,const NAME(N)&,v2)\
+	PREFIX OPINP(NAME(N),-=,-,NAME(N)&,v,const NAME(N)&,v2)\
 
 //operator define expanded
 #define OPRDEFE(NAME,N,OP,...) PREFIX OPRVE(NAME(N),OP,const NAME(N)& v,T m,__VA_ARGS__)
@@ -36,8 +38,8 @@
 #define MATDEFVEC(N)\
 	PREFIX OPRV(VEC(N),*,const VEC(N)&,v,const MAT(N)&,mat)\
 	PREFIX OPRV(VEC(N),/,const VEC(N)&,v,const MAT(N)&,mat)\
-	PREFIX OPINP(VEC(N),*=,*,const VEC(N)&,v,const MAT(N)&,mat)\
-	PREFIX OPINP(VEC(N),/=,/,const VEC(N)&,v,const MAT(N)&,mat)\
+	PREFIX OPINP(VEC(N),*=,*,VEC(N)&,v,const MAT(N)&,mat)\
+	PREFIX OPINP(VEC(N),/=,/,VEC(N)&,v,const MAT(N)&,mat)\
 
 
 namespace PTOS {

@@ -9,6 +9,7 @@
 #include "Application.h"
 #include "Buffer.h"
 #include "Camera.h"
+#include "ComponentTransform.h"
 #include "EventSystem.h"
 #include "GLFWBuffer.h"
 #include "GLFWRenderer.h"

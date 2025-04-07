@@ -34,17 +34,28 @@ namespace PTOS {
 		void setTitle(const std::string& title) override;
 		inline std::string getRendererName() override { return "GLFWWindoRenderer"; }
 		void* getImplWindow() override;
+		float getDeltaTime() const override { return deltaTime; }
 
 
-			inline bool isCreated() override { return win != nullptr; }
+		inline bool isCreated() override { return win != nullptr; }
 		inline GLFWimage* getIcon() { return &icon; }
 		void setIcon(GLFWimage& icon);
+
+	protected:
+
+		void setDeltaTime() override {
+			float now = glfwGetTime();
+			deltaTime = now - lastTime;
+			lastTime = now;
+		}
 
 	private:
 		//Window
 
 		GLFWimage icon = PTOS_GLFW_ICON_EMPTY;
 		GLFWwindow* win = nullptr;
+		float deltaTime = 0;
+		float lastTime = 0;
 	};
 
 	const std::unordered_map<int, Inputs::Code> codeMapGLFW = {

@@ -19,10 +19,12 @@ namespace PTOS {
 	static int initializedGLFW = 0; //count number of WindowRenderers using GLFW
 
 	void GLFWWindowRenderer::setVsync(bool vsync) {
-		if (vsync)
-			glfwSwapInterval(VSYNC_INTERVAL);
-		else
-			glfwSwapInterval(0);
+		if (win != nullptr) {
+			if (vsync)
+				glfwSwapInterval(VSYNC_INTERVAL);
+			else
+				glfwSwapInterval(0);
+		}
 		PTOS_CORE_TRACE("GLFW WindowRenderer \"{0}\": vsync {1} -> {2}", title, this->vsync, vsync);
 		this->vsync = vsync;
 	}
@@ -73,7 +75,7 @@ namespace PTOS {
 
 		//swap buffers
 		glfwSwapBuffers(win);
-		setLastFrame();
+		setDeltaTime();
 		esys->addEvent(eventLayer, {EventTypes::WINDOW_UPDATE, PTOS_EVENTDATA WindowEvent{this}});
 	}
 

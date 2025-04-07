@@ -51,7 +51,6 @@ namespace PTOS {
 		inline WindowSize getSize() const { return size; }
 		//Gets the window's title
 		inline std::string getTitle() const { return title; }
-		inline std::chrono::steady_clock::time_point getLastFrame() const { return lastFrame; }
 
 
 		//Initializes the window renderer
@@ -84,8 +83,10 @@ namespace PTOS {
 		virtual bool isCreated() = 0;
 		//Gets the renderer name
 		virtual std::string getRendererName() = 0;
-		//TODO docs
+		//Get the renderer's implementation specific window data
 		virtual void* getImplWindow() = 0;
+		//Get the time between this frame and the last
+		virtual float getDeltaTime() const = 0;
 
 	protected:
 
@@ -103,8 +104,6 @@ namespace PTOS {
 
 		//Renderer
 
-		inline void setLastFrame() { lastFrame = std::chrono::high_resolution_clock::now(); }
-
-		std::chrono::steady_clock::time_point lastFrame = std::chrono::high_resolution_clock::now();
+		virtual void setDeltaTime() = 0;
 	};
 }

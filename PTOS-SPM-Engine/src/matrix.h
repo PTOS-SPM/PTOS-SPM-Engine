@@ -48,28 +48,28 @@ namespace PTOS {
 
 		//Matrix * Matrix
 
-		inline Matrix2<T> operator * (const Matrix2<T>& mat) {
+		inline Matrix2<T> operator * (const Matrix2<T>& mat) const {
 			return Matrix2<T>({
 				{ mat[0][0] * data[0][0] + mat[1][0] * data[0][1], mat[0][1] * data[0][0] + mat[1][1] * data[0][1] },
 				{ mat[1][0] * data[1][1] + mat[0][0] * data[1][0], mat[1][1] * data[1][1] + mat[0][1] * data[1][0] },
 				});
 		}
 
-		inline Matrix2<T> operator / (const Matrix2<T>& mat) {
+		inline Matrix2<T> operator / (const Matrix2<T>& mat) const {
 			return Matrix2<T>({
 				{ PTOS_ZERO_DIVIDE(mat[0][0], data[0][0]) + PTOS_ZERO_DIVIDE(mat[1][0], data[0][1]), PTOS_ZERO_DIVIDE(mat[0][1], data[0][0]) + PTOS_ZERO_DIVIDE(mat[1][1], data[0][1]) },
 				{ PTOS_ZERO_DIVIDE(mat[1][0], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][0], data[1][0]), PTOS_ZERO_DIVIDE(mat[1][1], data[1][1]) + PTOS_ZERO_DIVIDE(mat[0][1], data[1][0]) }
 				});
 		}
 
-		inline Matrix2<T> operator + (const Matrix2<T>& mat) {
+		inline Matrix2<T> operator + (const Matrix2<T>& mat) const {
 			return Matrix2<T>({
 				{ data[0][0] + mat[0][0], data[0][1] + mat[0][1] },
 				{ data[1][0] + mat[1][0], data[1][1] + mat[1][1] }
 				});
 		}
 
-		inline Matrix2<T> operator - (const Matrix2<T>& mat) {
+		inline Matrix2<T> operator - (const Matrix2<T>& mat) const {
 			return Matrix2<T>({
 				{ data[0][0] - mat[0][0], data[0][1] - mat[0][1] },
 				{ data[1][0] - mat[1][0], data[1][1] - mat[1][1] }
@@ -78,14 +78,14 @@ namespace PTOS {
 
 		//Matrix * Vector
 
-		inline Vector2<T> operator * (const Vector2<T>& v) {
+		inline Vector2<T> operator * (const Vector2<T>& v) const {
 			return Vector2<T>(
 				data[0][0] * v[0] + data[1][0] * v[1],
 				data[0][1] * v[0] + data[1][1] * v[1]
 			);
 		}
 
-		inline Vector2<T> operator / (const Vector2<T>& v) {
+		inline Vector2<T> operator / (const Vector2<T>& v) const {
 			return Vector2<T>(
 				PTOS_ZERO_DIVIDE(data[0][0], v[0]) + PTOS_ZERO_DIVIDE(data[1][0], v[1]),
 				PTOS_ZERO_DIVIDE(data[0][1], v[0]) + PTOS_ZERO_DIVIDE(data[1][1], v[1])
@@ -127,7 +127,6 @@ namespace PTOS {
 		}
 
 		inline Matrix2<T> inverse() const {
-			T data[2][2];
 			T det = data[0][0] * data[1][1] - data[0][1] * data[1][0];
 			if (det != 0)
 				return Matrix2({
@@ -170,6 +169,10 @@ namespace PTOS {
 
 		T data[3][3]{ {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
 		bool valid = true;
+
+		inline T* operator [] (int index) {
+			return data[index];
+		}
 
 		inline const T* operator [] (int index) const {
 			return data[index];
