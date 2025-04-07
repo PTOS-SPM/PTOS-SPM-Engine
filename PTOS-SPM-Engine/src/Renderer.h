@@ -16,6 +16,18 @@ namespace PTOS {
 	// takes 4 hex vales (rgba) and stores them as percents (x / 0xff) in a vec4
 	inline rgba rgbaHexToP(float r, float g, float b, float a = 0xff) { return rgba(r / 0xff, g / 0xff, b / 0xff, a / 0xff); }
 
+
+	namespace Renderers {
+		enum RendererName {
+			GL
+		};
+	}
+
+#ifdef PTOS_RENDER_DYNAMIC
+	extern Renderers::RendererName CURRENT_RENDERER;
+#endif
+
+
 	class SceneInfo {
 	public:
 		SceneInfo();
@@ -48,6 +60,7 @@ namespace PTOS {
 		void submit(SceneInfo* scene, SceneItem* item);
 		void submit(SceneInfo* scene);
 
+		virtual void init() = 0;
 		virtual void setClearColor(const rgba& color) = 0;
 		virtual void clear() = 0;
 		virtual void drawIndexed(VertexArray* vertexArray) = 0;

@@ -2,6 +2,10 @@
 
 namespace PTOS {
 
+#ifdef PTOS_RENDER_DYNAMIC
+	PTOS_API Renderers::RendererName CURRENT_RENDERER = Renderers::GL;
+#endif
+
 	SceneInfo::SceneInfo() {
 		camera = new Camera2D();
 	}
@@ -9,8 +13,10 @@ namespace PTOS {
 		this->camera = camera;
 	}
 	SceneInfo::~SceneInfo() {
-		if (camera != nullptr)
+		if (camera != nullptr) {
 			delete camera;
+			camera = nullptr;
+		}
 	}
 
 	void SceneInfo::addSceneItem(SceneItem* item) {
@@ -36,15 +42,6 @@ namespace PTOS {
 
 		if (modified)
 			overrideVPCache = true;
-	}
-
-	SceneItem::~SceneItem() {
-		if (shader != nullptr)
-			delete shader;
-		if (vertexArray != nullptr)
-			delete vertexArray;
-		if (transform != nullptr)
-			delete transform;
 	}
 
 	void Renderer::submit(SceneInfo* scene, SceneItem* item) {
