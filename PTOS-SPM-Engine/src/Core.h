@@ -1,5 +1,9 @@
 #pragma once
 
+#if !(defined(PTOS_RENDER_DYNAMIC) || defined(PTOS_RENDER_GL))
+#error bad or missing renderer type (missing definition PTOS_RENDER_INSERTNAME)
+#endif
+
 #ifdef PTOS_PLATFORM_WINDOWS
 #ifdef PTOS_LINK_DYNAMIC
 #ifdef PTOS_BUILD_DLL

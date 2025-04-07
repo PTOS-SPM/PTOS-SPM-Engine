@@ -17,6 +17,7 @@ project "PTOS-SPM-Engine"
 
     includedirs
     {
+        cwd .. "/%{prj.name}/libs/stb",
         cwd .. "/%{prj.name}/src",
         cwd .. "/%{prj.name}/libs/spdlog/include",
         cwd .. "/%{prj.name}/libs/glm",
@@ -44,7 +45,8 @@ project "PTOS-SPM-Engine"
         defines
         {
             "PTOS_PLATFORM_WINDOWS",
-            "PTOS_BUILD_STATIC"
+            "PTOS_BUILD_STATIC",
+            RENDERER
         }
 
     filter "configurations:Debug"
