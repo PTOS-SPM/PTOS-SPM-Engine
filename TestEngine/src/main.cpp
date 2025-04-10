@@ -73,12 +73,15 @@ PTOS::GLFWIndexBuffer squareIndexBuffer;
 PTOS::GLFWIndexBuffer logoIndexBuffer;
 PTOS::GLFWIndexBuffer alphaTestIndexBuffer;
 
-PTOS::Shader* textureShader = nullptr;
+PTOS::ShaderLibrary library;
 
 //generate arrays and buffers
 void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 
 	windowRenderer->bind();
+
+	std::string textureName;
+	PTOS::Shader* textureShader = library.load("shaders/texture.glsl", textureName);
 
 	square.vertexArray = new PTOS::GLFWVertexArray();
 	square.vertexArray->create();
@@ -158,8 +161,6 @@ void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 	unsigned int logoIndecies[6] = { 0, 1, 2, 2, 3, 0 };
 	logoIndexBuffer.create(logoIndecies, sizeof(logoIndecies));
 	logo.vertexArray->setIndexBuffer(&logoIndexBuffer);
-
-	textureShader = PTOS::Shader::create("shaders/texture.glsl");
 
 	logo.shader = textureShader->copy();
 	logo.transform = new PTOS::ComponentTransform();
@@ -246,12 +247,12 @@ PTOS::EventResult onAppEnd(const PTOS::EventContext& ctx) {
 
 	delete logo.vertexArray;
 	delete logo.transform;
-	delete logo.shader;
+	//delete logo.shader; //handled by shader library
 	delete logo.texture;
 
 	delete alphaTest.vertexArray;
 	delete alphaTest.transform;
-	delete alphaTest.shader;
+	//delete alphaTest.shader; //handled by shader library
 	delete alphaTest.texture;
 
 	return {};
@@ -324,10 +325,10 @@ PTOS::EventResult onWindowResize(const PTOS::EventContext& ctx) {
 	float aw, ah;
 	if (event->dx > event->dy) {
 		aw = 1;
-		ah = event->dy / event->dx;
+		ah = (float)(event->dy / event->dx);
 	}
 	else {
-		aw = event->dx / event->dy;
+		aw = (float)(event->dx / event->dy);
 		ah = 1;
 	}
 	*scene.camera = PTOS::Camera2D(-ah, ah, -aw, aw);

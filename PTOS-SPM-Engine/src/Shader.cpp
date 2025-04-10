@@ -10,6 +10,8 @@
 #include "GLFWShader.h"
 #endif
 
+#include <sstream>
+
 
 #define _PTOS_CREATE_SHADER_FILE_GL		std::string* src = nullptr; \
 										int* types = nullptr; \
@@ -55,5 +57,68 @@ namespace PTOS {
 		_PTOS_CREATE_SHADER_GL;
 #endif
 		return nullptr;
+	}
+
+	ShaderLibrary::~ShaderLibrary() {
+		for (auto it = shaders.begin(); it != shaders.end(); it++) {
+			if (it->second.owned)
+				delete it->second.shader;
+		}
+		shaders.clear();
+	}
+
+	bool ShaderLibrary::add(const std::string& name, Shader* shader) {
+		auto entry = shaders.find(name);
+		if (entry != shaders.end())
+			return false;
+		entry->second = ShaderLibraryEntry{ shader, false };
+		return true;
+	}
+
+	Shader* ShaderLibrary::load(const std::string& filePath, std::string& nameOut) {
+		Shader* shader = Shader::create(filePath);
+		if (shader == nullptr)
+			return nullptr;
+
+		size_t start = filePath.find_last_of("/\\") + 1; //if std::string::npos, then max(size_t) + 1 == 0 (overflow)
+		size_t end = filePath.rfind('.');
+		if (end == std::string::npos)
+			end = filePath.size() - start;
+		std::string nameBase = filePath.substr(start, end - start);
+		std::string shaderName = nameBase;
+		
+		size_t i = 0;
+		auto entry = shaders.find(shaderName);
+		while (entry != shaders.end()) {
+			shaderName = nameBase + std::to_string(i);
+			entry = shaders.find(shaderName);
+		}
+
+		shaders[shaderName] = ShaderLibraryEntry{ shader, true };
+		return shader;
+	}
+
+	bool ShaderLibrary::remove(Shader* shader) {
+		bool has = false;
+		for (auto it = shaders.begin(); it != shaders.end();) {
+			if (it->second.shader == shader) {
+				shaders.erase(it);
+				if (!has)
+					has = true;
+			}
+			else it++;
+		}
+		return has;
+	}
+
+	bool ShaderLibrary::remove(const std::string& name) {
+		return shaders.erase(name);
+	}
+
+	Shader* ShaderLibrary::get(const std::string& name) const {
+		auto entry = shaders.find(name);
+		if (entry == shaders.end())
+			return nullptr;
+		return entry->second.shader;
 	}
 }
