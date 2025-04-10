@@ -36,13 +36,14 @@ namespace PTOS {
 	}
 
 	bool EventLayer::addListener(EventType type, const EventListener& listener) {
-		if (listeners.find(type) == listeners.end()) {
+		auto entry = listeners.find(type);
+		if (entry == listeners.end()) {
 			EventListenerNode* node = new EventListenerNode;
 			node->listener = listener;
 			listeners[type] = node;
 		}
 		else {
-			EventListenerNode* node = listeners[type];
+			EventListenerNode* node = entry->second;
 			//node should never be nullptr, let any errors happen if it is
 			if (node->listener.handler == listener.handler) {
 				node->listener = listener;
@@ -68,13 +69,14 @@ namespace PTOS {
 	}
 
 	bool EventLayer::removeListener(EventType type, EventListenerFunc listener) {
-		if (listeners.find(type) == listeners.end())
+		auto entry = listeners.find(type);
+		if (entry == listeners.end())
 			return false;
-		EventListenerNode* node = listeners[type];
+		EventListenerNode* node = entry->second;
 		//node should never be nullptr, let any errors happen if it is
 		if (node->next == nullptr && node->listener.handler == listener) {
 			delete node;
-			listeners.erase(type);
+			listeners.erase(entry);
 			return true;
 		}
 		while (node->next != nullptr) {
@@ -89,9 +91,10 @@ namespace PTOS {
 	}
 
 	bool EventLayer::hasListener(EventType type, EventListenerFunc listener) {
-		if (listeners.find(type) == listeners.end())
+		auto entry = listeners.find(type);
+		if (entry == listeners.end())
 			return false;
-		EventListenerNode* node = listeners[type];
+		EventListenerNode* node = entry->second;
 		while (node != nullptr) {
 			if (node->listener.handler == listener)
 				return true;
@@ -102,12 +105,13 @@ namespace PTOS {
 
 	EventResult EventLayer::handle(const EventContext& ctx, bool isBubble, bool isCapture) {
 		EventType type = ctx.event.type;
-		if (listeners.find(type) == listeners.end())
+		auto entry = listeners.find(type);
+		if (entry == listeners.end())
 			return EventResult{};
 
 		EventResult finalResult{};
 
-		EventListenerNode* node = listeners[type];
+		EventListenerNode* node = entry->second;
 		while (node != nullptr) {
 			if ((isBubble && node->listener.bubble) || (isCapture && node->listener.capture)) {
 				EventResult res = node->listener.handler(ctx);
@@ -198,11 +202,12 @@ namespace PTOS {
 	void EventSystem::addEvent(const EventLayer* layer, const Event& event) {
 		PTOS_ASSERT(layer != nullptr, "layer cannot be nullptr");
 #ifdef PTOS_LOGGING
+		auto entry = EventTypes::EVENT_TYPE_NAMES.find(event.type);
 		if (layer != EventLayers::APPLICATION) {
-			if (EventTypes::EVENT_TYPE_NAMES.find(event.type) == EventTypes::EVENT_TYPE_NAMES.end())
+			if (entry == EventTypes::EVENT_TYPE_NAMES.end())
 				PTOS_CORE_TRACE("New Event [{0}@{1}]", event.type, (void*)layer);
 			else
-				PTOS_CORE_TRACE("New Event [{0}@{1}]", EventTypes::EVENT_TYPE_NAMES[event.type], (void*)layer);
+				PTOS_CORE_TRACE("New Event [{0}@{1}]", entry->second, (void*)layer);
 		}
 #endif
 		if (eventQueueTail == nullptr) {
