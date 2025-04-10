@@ -12,8 +12,8 @@
 #endif
 
 namespace PTOS {
-	template<typename T> inline T radians(T degrees) { return degrees * 0.017453292519943295; }
-	template<typename T> inline T degrees(T radians) { return radians * 57.29577951308232; }
+	template<typename T> inline T radians(T degrees) { return degrees * (T)0.017453292519943295; }
+	template<typename T> inline T degrees(T radians) { return radians * (T)57.29577951308232; }
 
 #define PTOS_MAT2_IDENTITY mat2({ {1, 0}, {0, 1} })
 #define PTOS_DMAT2_IDENTIDY dmat2({ {1, 0}, {0, 1} })
