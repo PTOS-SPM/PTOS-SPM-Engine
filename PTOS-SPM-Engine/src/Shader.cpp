@@ -121,4 +121,14 @@ namespace PTOS {
 			return nullptr;
 		return entry->second.shader;
 	}
+
+	bool ShaderLibrary::change(const std::string& oldname, const std::string& newname) {
+		auto entry = shaders.find(oldname);
+		if (entry == shaders.end() || shaders.find(newname) != shaders.end())
+			return false;
+		ShaderLibraryEntry libraryEntry = entry->second;
+		shaders.erase(entry);
+		shaders[newname] = libraryEntry;
+		return true;
+	}
 }

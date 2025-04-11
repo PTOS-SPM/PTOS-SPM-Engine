@@ -75,8 +75,9 @@ namespace PTOS {
 			}
 			if (item->texture != nullptr) {
 				item->texture->bind();
-			}
-			drawIndexed(item->vertexArray);
+				drawIndexed(item->vertexArray);
+				item->texture->unbind();
+			} else drawIndexed(item->vertexArray);
 		}
 		scene->overrideVPCache = false;
 	}

@@ -13,6 +13,7 @@ namespace PTOS {
 		inline uint32_t getHeight() override { return height; }
 
 		void bind(uint32_t slot) override;
+		void unbind() override;
 
 	private:
 		std::string path;

@@ -60,4 +60,8 @@ namespace PTOS {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 	}
+
+	void GLFWTexture2D::unbind() {
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
