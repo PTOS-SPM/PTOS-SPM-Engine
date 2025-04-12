@@ -83,6 +83,7 @@ namespace PTOS {
 	class PTOS_API Renderer;
 
 	class PTOS_API Shader;
+	class PTOS_API ShaderLibrary;
 
 	enum class PTOS_API BuffElmTypeName : uint16_t;
 	struct PTOS_API BuffElmType;
