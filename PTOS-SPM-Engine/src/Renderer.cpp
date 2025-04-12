@@ -2,6 +2,10 @@
 
 namespace PTOS {
 
+#ifdef PTOS_RENDER_DYNAMIC
+	PTOS_API Renderers::RendererName CURRENT_RENDERER = Renderers::GL;
+#endif
+
 	SceneInfo::SceneInfo() {
 		camera = new Camera2D();
 	}
@@ -9,8 +13,10 @@ namespace PTOS {
 		this->camera = camera;
 	}
 	SceneInfo::~SceneInfo() {
-		if (camera != nullptr)
+		if (camera != nullptr) {
 			delete camera;
+			camera = nullptr;
+		}
 	}
 
 	void SceneInfo::addSceneItem(SceneItem* item) {
@@ -38,15 +44,6 @@ namespace PTOS {
 			overrideVPCache = true;
 	}
 
-	SceneItem::~SceneItem() {
-		if (shader != nullptr)
-			delete shader;
-		if (vertexArray != nullptr)
-			delete vertexArray;
-		if (transform != nullptr)
-			delete transform;
-	}
-
 	void Renderer::submit(SceneInfo* scene, SceneItem* item) {
 		if (scene->camera->recalc() || scene->overrideVPCache) {
 			item->shader->bind();
@@ -55,6 +52,10 @@ namespace PTOS {
 		if (item->transform != nullptr) {
 			item->transform->calcMatrix();
 			item->shader->upload("transform", item->transform->getMatrix());
+		}
+		if (item->texture != nullptr) {
+			item->texture->bind();
+			item->shader->upload("sampler", 0);
 		}
 		drawIndexed(item->vertexArray);
 		scene->overrideVPCache = false;
@@ -72,7 +73,11 @@ namespace PTOS {
 				item->transform->calcMatrix();
 				item->shader->upload("transform", item->transform->getMatrix());
 			}
-			drawIndexed(item->vertexArray);
+			if (item->texture != nullptr) {
+				item->texture->bind();
+				drawIndexed(item->vertexArray);
+				item->texture->unbind();
+			} else drawIndexed(item->vertexArray);
 		}
 		scene->overrideVPCache = false;
 	}

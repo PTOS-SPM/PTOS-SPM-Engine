@@ -13,6 +13,8 @@ IncludeDir["GLFW"] = "PTOS-SPM-Engine/libs/glfw/include"
 IncludeDir["GLAD"] = "PTOS-SPM-Engine/libs/glad/include"
 IncludeDir["glm"] = "PTOS-SPM-Engine/libs/glm"
 
+RENDERER = "PTOS_RENDER_GL" -- GL | DX | VLK | DYNAMIC
+
 include "PTOS-SPM-Engine/libs/glfw"
 include "PTOS-SPM-Engine/libs/glad"
 include "PTOS-SPM-Engine"
@@ -55,7 +57,8 @@ project "TestEngine"
 
         defines
         {
-            "PTOS_PLATFORM_WINDOWS"
+            "PTOS_PLATFORM_WINDOWS",
+            RENDERER
         }
 
     filter "configurations:Debug"

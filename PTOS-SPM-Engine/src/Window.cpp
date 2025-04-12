@@ -17,6 +17,7 @@ namespace PTOS {
 
 	void Window::open() {
 		windowRenderer->create();
+		renderer->init();
 	}
 
 	void Window::close() {

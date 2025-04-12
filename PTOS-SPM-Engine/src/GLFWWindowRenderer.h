@@ -43,11 +43,7 @@ namespace PTOS {
 
 	protected:
 
-		void setDeltaTime() override {
-			float now = glfwGetTime();
-			deltaTime = now - lastTime;
-			lastTime = now;
-		}
+		void setDeltaTime() override;
 
 	private:
 		//Window
@@ -56,6 +52,8 @@ namespace PTOS {
 		GLFWwindow* win = nullptr;
 		float deltaTime = 0;
 		float lastTime = 0;
+
+		bool needsGladInit = false;
 	};
 
 	const std::unordered_map<int, Inputs::Code> codeMapGLFW = {

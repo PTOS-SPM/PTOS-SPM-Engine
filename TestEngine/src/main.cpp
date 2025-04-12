@@ -1,9 +1,4 @@
-
-//DEBUG
-#include "glad/glad.h"
-
 #include "PTOS.h"
-#include <iostream>
 
 //Shaders
 
@@ -64,16 +59,29 @@ PTOS::Window* mainWindow = nullptr;
 
 PTOS::SceneInfo scene;
 PTOS::SceneItem triangle;
+PTOS::SceneItem logo;
 PTOS::SceneItem square;
+PTOS::SceneItem alphaTest;
+
 PTOS::GLFWVertexBuffer triangleBuffer;
 PTOS::GLFWVertexBuffer squareBuffer;
+PTOS::GLFWVertexBuffer logoBuffer;
+PTOS::GLFWVertexBuffer alphaTestBuffer;
+
 PTOS::GLFWIndexBuffer triangleIndexBuffer;
 PTOS::GLFWIndexBuffer squareIndexBuffer;
+PTOS::GLFWIndexBuffer logoIndexBuffer;
+PTOS::GLFWIndexBuffer alphaTestIndexBuffer;
+
+PTOS::ShaderLibrary library;
 
 //generate arrays and buffers
 void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 
 	windowRenderer->bind();
+
+	std::string textureName;
+	PTOS::Shader* textureShader = library.load("shaders/texture.glsl", textureName);
 
 	square.vertexArray = new PTOS::GLFWVertexArray();
 	square.vertexArray->create();
@@ -99,7 +107,6 @@ void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 	square.vertexArray->setIndexBuffer(&squareIndexBuffer);
 
 	triangle.vertexArray = new PTOS::GLFWVertexArray();
-
 	triangle.vertexArray->create();
 	triangle.vertexArray->bind();
 
@@ -122,18 +129,76 @@ void initVisualData(PTOS::WindowRenderer* windowRenderer) {
 	triangleIndexBuffer.create(triangleIndecies, sizeof(triangleIndecies));
 	triangle.vertexArray->setIndexBuffer(&triangleIndexBuffer);
 
-	std::string triangleSrc[] = { vertexSrc, pixelSrc };
-	std::string squareSrc[] = { vertexSrc, colorPixelSrc };
-	int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+	square.shader = PTOS::Shader::create(vertexSrc, colorPixelSrc);
+	square.shader->bind();
+	square.shader->upload("_color", PTOS::vec3(0, 1.0f, 0));
 
-	square.shader = PTOS::GLFWShader::compile(squareSrc, types, sizeof(squareSrc) / sizeof(squareSrc[0]));
-
-	triangle.shader = PTOS::GLFWShader::compile(triangleSrc, types, sizeof(triangleSrc) / sizeof(triangleSrc[0]));
+	triangle.shader = PTOS::Shader::create(vertexSrc, pixelSrc);
 	square.transform = new PTOS::ComponentTransform();
 	triangle.transform = new PTOS::ComponentTransform();
 
+	logo.texture = PTOS::Texture2D::create("ptos_spm_logo.png");
+	logo.vertexArray = new PTOS::GLFWVertexArray();
+	logo.vertexArray->create();
+	logo.vertexArray->bind();
+
+	float logoPPs[4 * 5] = {
+		-0.5f, -0.5f, 0.0f, 0, 0,
+		0.5f, -0.5f, 0.0f, 1, 0,
+		0.5f, 0.5f, 0.0f, 1, 1,
+		-0.5f, 0.5f, 0.0f, 0, 1,
+	};
+
+	logoBuffer.create(logoPPs, sizeof(logoPPs));
+
+	PTOS::BufferLayout logoLayout = {
+		{ PTOS::BuffElmType::FLOAT(3), "_position", },
+		{ PTOS::BuffElmType::FLOAT(2), "_textcoord" }
+	};
+	logoBuffer.setLayout(logoLayout);
+	logo.vertexArray->addVertexBuffer(&logoBuffer);
+
+	unsigned int logoIndecies[6] = { 0, 1, 2, 2, 3, 0 };
+	logoIndexBuffer.create(logoIndecies, sizeof(logoIndecies));
+	logo.vertexArray->setIndexBuffer(&logoIndexBuffer);
+
+	logo.shader = textureShader->copy();
+	logo.transform = new PTOS::ComponentTransform();
+	logo.transform->setPosition(PTOS::vec3(-1, 0, 0));
+
+	alphaTest.texture = PTOS::Texture2D::create("alpha_test.png");
+	alphaTest.vertexArray = new PTOS::GLFWVertexArray();
+	alphaTest.vertexArray->create();
+	alphaTest.vertexArray->bind();
+
+	float alphaTestPPs[4 * 5] = {
+		-0.5f, -0.5f, 0.0f, 0, 0,
+		0.5f, -0.5f, 0.0f, 1, 0,
+		0.5f, 0.5f, 0.0f, 1, 1,
+		-0.5f, 0.5f, 0.0f, 0, 1,
+	};
+
+	alphaTestBuffer.create(alphaTestPPs, sizeof(alphaTestPPs));
+
+	PTOS::BufferLayout alphaTestLayout = {
+		{ PTOS::BuffElmType::FLOAT(3), "_position" },
+		{ PTOS::BuffElmType::FLOAT(2), "_textcoord" }
+	};
+	alphaTestBuffer.setLayout(alphaTestLayout);
+	alphaTest.vertexArray->addVertexBuffer(&alphaTestBuffer);
+
+	unsigned int alphaTestIndecies[6] = { 0, 1, 2, 2, 3, 0 };
+	alphaTestIndexBuffer.create(alphaTestIndecies, sizeof(alphaTestIndecies));
+	alphaTest.vertexArray->setIndexBuffer(&alphaTestIndexBuffer);
+
+	alphaTest.shader = textureShader;
+	alphaTest.transform = new PTOS::ComponentTransform();
+	alphaTest.transform->setPosition(PTOS::vec3(1, 0, 0));
+
 	scene.addSceneItem(&square);
 	scene.addSceneItem(&triangle);
+	scene.addSceneItem(&logo);
+	scene.addSceneItem(&alphaTest);
 }
 
 
@@ -165,7 +230,31 @@ PTOS::EventResult onAppStart(const PTOS::EventContext& ctx) {
 }
 
 PTOS::EventResult onAppEnd(const PTOS::EventContext& ctx) {
+	//delete everything except App (gets deleted in Start.h)
 	App = nullptr;
+	delete mainWindow;
+
+	delete scene.camera;
+	scene.camera = nullptr;
+
+	delete square.vertexArray;
+	delete square.transform;
+	delete square.shader;
+
+	delete triangle.vertexArray;
+	delete triangle.transform;
+	delete triangle.shader;
+
+	delete logo.vertexArray;
+	delete logo.transform;
+	//delete logo.shader; //handled by shader library
+	delete logo.texture;
+
+	delete alphaTest.vertexArray;
+	delete alphaTest.transform;
+	//delete alphaTest.shader; //handled by shader library
+	delete alphaTest.texture;
+
 	return {};
 }
 
@@ -209,9 +298,6 @@ PTOS::EventResult onWindowUpdate(const PTOS::EventContext& ctx) {
 		triangle.transform->setPosition(PTOS::vec3(0, 0, 0));
 	}
 
-	square.shader->bind();
-	square.shader->upload("_color", PTOS::vec3(0, 1.0f, 0));
-
 	for (auto& pair : input.getAnyAll()) {
 		PTOS_DEBUG("{0}: {1}", (int)pair.first, pair.second.count);
 	}
@@ -239,10 +325,10 @@ PTOS::EventResult onWindowResize(const PTOS::EventContext& ctx) {
 	float aw, ah;
 	if (event->dx > event->dy) {
 		aw = 1;
-		ah = event->dy / event->dx;
+		ah = (float)(event->dy / event->dx);
 	}
 	else {
-		aw = event->dx / event->dy;
+		aw = (float)(event->dx / event->dy);
 		ah = 1;
 	}
 	*scene.camera = PTOS::Camera2D(-ah, ah, -aw, aw);
