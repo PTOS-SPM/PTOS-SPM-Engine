@@ -43,11 +43,7 @@ namespace PTOS {
 
 	protected:
 
-		void setDeltaTime() override {
-			float now = (float)glfwGetTime();
-			deltaTime = now - lastTime;
-			lastTime = now;
-		}
+		void setDeltaTime() override;
 
 	private:
 		//Window

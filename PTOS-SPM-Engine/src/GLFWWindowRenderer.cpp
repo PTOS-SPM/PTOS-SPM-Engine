@@ -61,6 +61,12 @@ namespace PTOS {
 		this->icon = icon;
 	}
 
+	void GLFWWindowRenderer::setDeltaTime()  {
+		float now = (float)glfwGetTime();
+		deltaTime = now - lastTime;
+		lastTime = now;
+	}
+	
 	void GLFWWindowRenderer::bind() {
 		glfwMakeContextCurrent(win);
 	}
